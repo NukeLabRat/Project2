@@ -83,7 +83,7 @@ IsCenter=zeros(yEnd,xEnd);
     
     
     
-
+    
     for i = 1:xEnd
         for j = 1:yEnd
             if IsCenter(j,i)==true %checks if node is central node
@@ -91,31 +91,35 @@ IsCenter=zeros(yEnd,xEnd);
                 vCentral=interp2(vXlocations,vYlocations,v,pXlocations,pYlocations);
                 uvdy=(interp2(uXlocations,uYlocations,u,uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v,uXlocations,uYlocations+.5*dy)...
                     -interp2(uXlocations,uYlocations,u,uXlocations,uYlocations-.5*dy).*interp2(vXlocations,vYlocations,v,uXlocations,uYlocations-.5*dy))/dy;
-                 uvdx=(interp2(uXlocations,uYlocations,u,vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v,vXlocations+.5*dx,vYlocations)...
+                uvdx=(interp2(uXlocations,uYlocations,u,vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v,vXlocations+.5*dx,vYlocations)...
                     -interp2(uXlocations,uYlocations,u,vXlocations-.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v,vXlocations-.5*dx,vYlocations))/dx;
                 
                 dxu2=(uCentral(j,i+1)^2-uCentral(j,i)^2)/dx;
-                dxu2=(vCentral(j,i+1)^2-vCentral(j,i)^2)/dx;
+                dyv2=(vCentral(j+1,i)^2-vCentral(j,i)^2)/dy;
                 
                 dudx2=(u(j,i+1)-2*u(j,i)+u(j,i-1))./dx^2;
                 dudy2=(u(j-1,i)-2*u(j,i)+u(j+1,i))./dy^2;
                 
                 dvdx2=(v(j,i+1)-2*v(j,i)+v(j,i-1))./dx^2;
                 dvdy2=(v(j-1,i)-2*v(j,i)+v(j+1,i))./dy^2;
-
+                
                 
                 
                 uStar(j,i) = (-dxu2-uvdy+1./Re.*(dudx2+dudy2)).*dt+u(j,i);
-                vStar(j,i) = (-dyu2-uvdx+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i);
-            
-              
-            
-            
+                vStar(j,i) = (-dyv2-uvdx+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i);
+                
+                
+                
+                
             else
                 Psi(j,i,k) = Psi(j,i,k-1); %applies BC condition of Boundary Nodes
             end
             
         end
-  end
-   
+    end
+    
+    
+    
+    
+    
 uStar=3
