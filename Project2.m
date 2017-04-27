@@ -82,18 +82,18 @@ IsCenter=zeros(yEnd,xEnd);
     end
     
     
-    
-    
-    for i = 1:xEnd
-        for j = 1:yEnd
-            if IsCenter(j,i)==true %checks if node is central node
-                uCentral=interp2(uXlocations,uYlocations,u,pXlocations,pYlocations);
+    uCentral=interp2(uXlocations,uYlocations,u,pXlocations,pYlocations);
                 vCentral=interp2(vXlocations,vYlocations,v,pXlocations,pYlocations);
                 uvdy=(interp2(uXlocations,uYlocations,u,uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v,uXlocations,uYlocations+.5*dy)...
                     -interp2(uXlocations,uYlocations,u,uXlocations,uYlocations-.5*dy).*interp2(vXlocations,vYlocations,v,uXlocations,uYlocations-.5*dy))/dy;
                 uvdx=(interp2(uXlocations,uYlocations,u,vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v,vXlocations+.5*dx,vYlocations)...
                     -interp2(uXlocations,uYlocations,u,vXlocations-.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v,vXlocations-.5*dx,vYlocations))/dx;
-                
+
+    
+    for i = 1:xEnd
+        for j = 1:yEnd
+            if IsCenter(j,i)==true %checks if node is central node
+                                
                 dxu2=(uCentral(j,i+1)^2-uCentral(j,i)^2)/dx;
                 dyv2=(vCentral(j+1,i)^2-vCentral(j,i)^2)/dy;
                 
@@ -105,8 +105,8 @@ IsCenter=zeros(yEnd,xEnd);
                 
                 
                 
-                uStar(j,i) = (-dxu2-uvdy+1./Re.*(dudx2+dudy2)).*dt+u(j,i);
-                vStar(j,i) = (-dyv2-uvdx+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i);
+                uStar(j,i) = (-dxu2-uvdy(j,i)+1./Re.*(dudx2+dudy2)).*dt+u(j,i);
+                vStar(j,i) = (-dyv2-uvdx(j,i)+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i);
                 
                 
                 
