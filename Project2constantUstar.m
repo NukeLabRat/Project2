@@ -102,17 +102,20 @@ TimeSteps=10;
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
- Ustar(:,:,1)=ones(uSize(1),uSize(2));
- Vstar(:,:,1)=ones(vSize(1),vSize(2));
-  dxUstarCentral(:,:,1)=ones(pSize(1),pSize(2));
- dyVstarCentral(:,:,1)=ones(pSize(1),pSize(2));
-
+Ustar(:,:,1)=ones(uSize(1),uSize(2));
+Vstar(:,:,1)=ones(vSize(1),vSize(2));
+dxUstar(:,:,1)=ones(uSize(1),uSize(2));
+dyVstar(:,:,1)=ones(vSize(1),vSize(2));
+duStarCentral(:,:,1)=ones(pSize(1),pSize(2));
+dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
+SOR=1;
+%     u(1,:,k)=-u(2,:,k-1);
+%     u(uSize(1),:,k)=2-u(uSize(1)-1,:,k-1);
+%     v(:,2,k)=-v(:,2,k-1);
+%     v(:,vSize(2),k)=-v(:,vSize(2)-1,k-1);
 for k=2:TimeSteps
     
-    u(1,:,k)=-u(2,:,k-1);
-    u(uSize(1),:,k)=2-u(uSize(1)-1,:,k-1);
-    v(:,2,k)=-v(:,2,k-1);
-    v(:,vSize(2),k)=-v(:,vSize(2)-1,k-1);
+
     
     
     uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations,pYlocations);
@@ -151,26 +154,77 @@ for k=2:TimeSteps
         end
     end
     
-    uStarCentral=interp2(uXlocations,uYlocations,Ustar,pXlocations,pYlocations);
-    vStarCentral=interp2(vXlocations,vYlocations,Vstar,pXlocations,pYlocations);
-    
-    for i = 1:xEnd
+    for i = 1:xEnd-1
         for j = 1:yEnd
-            if IsCenterP(j,i)==true %checks if node is central node
-                dxUstarCentral(j,i)=(uStarCentral(j,i+1)^2-uStarCentral(j,i)^2)/dx; %is in cell center
-                dyVstarCentral(j,i)=(vStarCentral(j+1,i)^2-vStarCentral(j,i)^2)/dy;
-                
+            if IsCenterX(j,i)==true %checks if node is central node
+                dxUstar(j,i)=(Ustar(j,i+1)^2-Ustar(j,i)^2)/dx; %is in cell center
             else %For Boundary Nodes
-                dxUstarCentral(j,i)=0;
-                dyVstarCentral(j,i)=0;
+                dxUstar(j,i)=1;
             end
         end
     end
     
-    ConstantMat=(dxUstarCentral+dyVstarCentral)./dt;
-    P(:,:,k)=PoisonPressure(ConstantMat,IsCenterP,P0);
-    
+    for i = 1:xEnd
+        for j = 1:yEnd-1
+            if IsCenterY(j,i)==true %checks if node is central node
+                dyVstar(j,i)=(Vstar(j+1,i)^2-Vstar(j,i)^2)/dy;
+            else %For Boundary Nodes
+                dyVstar(j,i)=1;
+            end
+        end
+    end
+    duStarCentral=interp2(uXlocations,uYlocations,dxUstar,pXlocations,pYlocations);
+    dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
+    ConstantMat=(duStarCentral+dvStarCentral)./dt;
+    P(:,:,k)=PoisonPressure(ConstantMat,IsCenterP,P0,dx,dy,SOR);
+    P0=P(:,:,k);
+    PinterpU=interp2(pXlocations,pYlocations,p(:,:,k),uXlocations,uYlocations);
+    PinterpV=interp2(pXlocations,pYlocations,p(:,:,k),vXlocations,vYlocations);
+    for i = 1:xEnd-1
+        for j = 1:yEnd
+            if IsCenterX(j,i)==true %checks if node is central node
+                u(j,i,k) = Ustar(j,i)+dt/dx*(PinterpU(j,i+1)-PinterpU(j,i));
+            else %For Boundary Nodes
+                if j==1
+                    u(j,i,k)=-u(2,i,k-1);
+                elseif j==uSize(1)
+                    u(j,i,k)=2-u(uSize(1)-1,i,k);
+                else
+                    u(j,i)=0;
+                end
+                
+            end
+            
+        end
+    end
+    for i = 1:xEnd
+        for j = 1:yEnd-1
+            if IsCenterY(j,i)==true %checks if node is central node
+                v(j,i,k) = Vstar(j,i)+dt/dy*(PinterpV(j+1,i)-PinterpV(j,i));
+            else %For Boundary Nodes
+                if i==1
+                    v(j,i,k)=-v(j,2,k-1);
+                elseif i==uSize(2)
+                    u(j,i,k)=-v(j,vSize(2)-1,k);
+                else
+                    v(j,i,k)=0;
+                end
+                
+                
+            end
+            
+        end
+    end
 end
+%% Plotting
+figure;
+pcolor(uXlocations(2:end-1,2:end-1), uYlocations(2:end-1,2:end-1),P(2:end-1,2:end-1,k));
+axes3 = gca;
+box(axes3,'on');
+set(axes3,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+title('u')
+axes2=gca;
+axes2.YDir='normal';
 
 
 

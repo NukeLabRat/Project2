@@ -1,4 +1,4 @@
-function [ Pressure, Iterations] = PoisonPressure( ConstantMat, IsCenterP, P0, dx, dy, SOR)
+function [ Pressure, Iterations] = TestPoisonPressure( ConstantMat, IsCenterP, P0)
 %PoisonPressure Pressure solving function
 %   Itteratively solves for the pressure field durring each timestep. Gives
 %   back the pressure field in a matrix at locations given in NodeX and
@@ -9,9 +9,14 @@ function [ Pressure, Iterations] = PoisonPressure( ConstantMat, IsCenterP, P0, d
 
 Iterations = 0;
 Error2 = 1;
-Beta=dx/dy;
+SOR=1; %1.7189 is optimal value.
+Beta=1;
+dx=.25;
 [ySize, xSize] = size(IsCenterP);
-Pold=P0;
+ConstantMat=zeros(ySize,xSize);
+P0=ConstantMat;
+Pold=rand(ySize,xSize);
+Pold(MatEdges(Pold))=1;
 P=Pold;
 while Error2>1E-8
     for i = (1:xSize)
