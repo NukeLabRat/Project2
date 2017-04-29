@@ -21,7 +21,7 @@ while Error2>1E-8
     for i = (2:xSize+1)
         for j = (2:ySize+1)
             if IsCenterP(j-1,i-1)==true %checks if node is central node
-            P(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Pold(j,i+1)+P(j,i-1)+Beta^2.*(Pold(j+1,i)+P(j-1,i))+dx^2.*ConstantMat(j,i))./(2*(1+Beta^2));
+            P(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Pold(j,i+1)+P(j,i-1)+Beta^2.*(Pold(j+1,i)+P(j-1,i))+dx^2.*ConstantMat(j-1,i-1))./(2*(1+Beta^2));
             
             else %For Boundary Nodes
                 if i==2
@@ -36,7 +36,7 @@ while Error2>1E-8
                 if j==ySize+1
                     Pold(j+1,i)=Pold(j,i);
                 end
-                    P(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Pold(j,i+1)+P(j,i-1)+Beta^2.*(Pold(j+1,i)+P(j-1,i))+dx^2.*ConstantMat(j,i))./(2*(1+Beta^2));
+                    P(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Pold(j,i+1)+P(j,i-1)+Beta^2.*(Pold(j+1,i)+P(j-1,i))+dx^2.*ConstantMat(j-1,i-1))./(2*(1+Beta^2));
                 
             end
             
