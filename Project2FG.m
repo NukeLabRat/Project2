@@ -7,7 +7,7 @@ clear
 clc
 
 Re=1;
-dt=.00005;
+dt=.0005;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -52,13 +52,6 @@ CenterNodesP = NodesP(~ismember(NodesP,BoundaryNodesP));
 CenterNodesX = NodesX(~ismember(NodesX,BoundaryNodesX));
 CenterNodesY = NodesY(~ismember(NodesY,BoundaryNodesY));
 
-rng('default')
-u=rand(uSize(1),uSize(2));
-v=u';
-% Ustar=u;
-% Vstar=u;
-
-
 IndexX=zeros(uSize(1),uSize(2));
 IsCenterX=zeros(uSize(1),uSize(2));
 for i = 1:uSize(2) %This loop determines whether each node is central node or boundary node.
@@ -98,11 +91,13 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
 end
 
 
-TimeSteps=30;
+TimeSteps=6;
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
-Ustar(:,:,1)=ones(uSize(1),uSize(2));
+F=zeros(uSize(1),uSize(2));
+G=zeros(vSize(1),vSize(2));
+Fstar(:,:,1)=ones(uSize(1),uSize(2));
 Vstar(:,:,1)=ones(vSize(1),vSize(2));
 dxUstar(:,:,1)=ones(uSize(1),uSize(2));
 dyVstar(:,:,1)=ones(vSize(1),vSize(2));
@@ -118,26 +113,27 @@ for k=2:TimeSteps
 
     
     
-    uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations,pYlocations);
-    vCentral=interp2(vXlocations,vYlocations,v(:,:,k-1),pXlocations,pYlocations);
-    uvdy=(interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations+.5*dy)...
-        -interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations-.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations-.5*dy))/dy;
-    uvdx=(interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations+.5*dx,vYlocations)...
-        -interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations-.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations-.5*dx,vYlocations))/dx;
-    
+%     uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations,pYlocations);
+%     vCentral=interp2(vXlocations,vYlocations,v(:,:,k-1),pXlocations,pYlocations);
+%     uvdy=(interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations+.5*dy)...
+%         -interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations-.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations-.5*dy))/dy;
+%     uvdx=(interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations+.5*dx,vYlocations)...
+%         -interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations-.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations-.5*dx,vYlocations))/dx;
+%     
+
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
                 uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations(j,i),pYlocations(j,i));
-                dxu2=(uCentral(j,i+1)^2-uCentral(j,i)^2)/dx;
-                dudx2=(u(j,i+1,k-1)-2*u(j,i,k)+u(j,i-1,k-1))./dx^2;
-                dudy2=(u(j-1,i,k-1)-2*u(j,i)+u(j+1,i,k-1))./dy^2;
+                dxu2=(uCentral^2-uCentral^2)/dx;
+                dudx2=(u(j,i+1,k-1)-2*u(j,i,k)+u(j,i-1,k))./dx^2;
+                dudy2=(u(j-1,i,k-1)-2*u(j,i)+u(j+1,i,k))./dy^2;
                 uvdy=(interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations(j,i),uYlocations(j,i)+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations(j,i),uYlocations(j,i)+.5*dy)...
         -interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations(j,i),uYlocations(j,i)-.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations(j,i),uYlocations(j,i)-.5*dy))/dy;
- 
-                Ustar(j,i) = (-dxu2-uvdy(j,i)+1./Re.*(dudx2+dudy2)).*dt+u(j,i,k);
+                F(j,i)=u(j,i)+dt*(dudx2/Re+
+                Ustar(j,i) = (-dxu2-uvdy+1./Re.*(dudx2+dudy2)).*dt+u(j,i,k-1);
             else %For Boundary Nodes
-                Ustar(j,i)=1;
+                Ustar(j,i)=0;
             end
             
         end
@@ -146,13 +142,16 @@ for k=2:TimeSteps
         for j = 1:yEnd-1
             if IsCenterY(j,i)==true %checks if node is central node
                 vCentral=interp2(vXlocations,vYlocations,v(:,:,k-1),pXlocations(j,i),pYlocations(j,i));
+                uvdx=(interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations(j,i)+.5*dx,vYlocations(j,i)).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations(j,i)+.5*dx,vYlocations(j,i))...
+        -interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations(j,i)-.5*dx,vYlocations(j,i)).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations(j,i)-.5*dx,vYlocations(j,i)))/dx;
+    
                 dyv2=(vCentral^2-vCentral^2)/dy;
                 dvdx2=(v(j,i+1,k-1)-2*v(j,i)+v(j,i-1,k-1))./dx^2;
                 dvdy2=(v(j-1,i,k-1)-2*v(j,i)+v(j+1,i,k-1))./dy^2;
-                Vstar(j,i) = (-dyv2-uvdx(j,i)+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i,k-1);
+                Vstar(j,i) = (-dyv2-uvdx+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i,k-1);
             else %For Boundary Nodes
                 
-                Vstar(j,i) =1;
+                Vstar(j,i) =0;
                 
             end
             
@@ -229,7 +228,7 @@ for k=2:TimeSteps
 end
 %% Plotting
 figure;
-pcolor(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),P(2:end-1,2:end-1,k));
+imagesc(P(2:end-1,2:end-1,k));
 axes1 = gca;
 box(axes1,'on');
 set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
@@ -238,7 +237,7 @@ axes1.YDir='normal';
 colorbar
 
 figure;
-pcolor(uXlocations(2:end-1,:),uYlocations(2:end-1,:),u(2:end-1,:,k));
+imagesc(u(2:end-1,:,k));
 axes1 = gca;
 box(axes1,'on');
 set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
@@ -247,7 +246,7 @@ axes1.YDir='normal';
 colorbar
 
 figure;
-pcolor(vYlocations(:,2:end-1), vXlocations(:,2:end-1),v(:,2:end-1,k));
+imagesc(v(:,2:end-1,k));
 axes1 = gca;
 box(axes1,'on');
 set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
