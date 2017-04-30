@@ -2,13 +2,13 @@
 
 % Dan Gould
 
- close all
+close all
 clear
 clc
 
-Re=10;
+Re=1;
 dt=.0005;
-TimeSteps=30;
+TimeSteps=10;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -102,21 +102,48 @@ dxUstar(:,:,1)=ones(uSize(1),uSize(2));
 dyVstar(:,:,1)=ones(vSize(1),vSize(2));
 duStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
-SOR=1.3;
+SOR=1.0;
+
+% for i = 1:xEnd-1
+%     for j = 1:yEnd
+%         if IsCenterX(j,i)==true %checks if node is central node
+%             u(j,i,1) = 0;
+%         else %For Boundary Nodes
+%             if j==1
+%                 u(j,i,1)=0;
+%             elseif j==uSize(1)
+%                 u(j,i,1)=2;
+%                 u(j,i,2)=2;
+%             else
+%                 u(j,i)=0;
+%             end
+%             
+%         end
+%         
+%     end
+% end
 
 for k=2:TimeSteps
     
+    %     uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations,pYlocations);
+    %     vCentral=interp2(vXlocations,vYlocations,v(:,:,k-1),pXlocations,pYlocations);
+    %     uvdy=(interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations+.5*dy)...
+    %         -interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations-.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations-.5*dy))/dy;
+    %     uvdx=(interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations+.5*dx,vYlocations)...
+    %         -interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations-.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations-.5*dx,vYlocations))/dx;
+    %
     uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations,pYlocations);
     vCentral=interp2(vXlocations,vYlocations,v(:,:,k-1),pXlocations,pYlocations);
     uvdy=(interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations+.5*dy)...
         -interp2(uXlocations,uYlocations,u(:,:,k-1),uXlocations,uYlocations-.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k-1),uXlocations,uYlocations-.5*dy))/dy;
     uvdx=(interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations+.5*dx,vYlocations)...
         -interp2(uXlocations,uYlocations,u(:,:,k-1),vXlocations-.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k-1),vXlocations-.5*dx,vYlocations))/dx;
-    
+%     uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations(j,i),pYlocations(j,i));
+%     dxu22=(uCentral2.^2-uCentral2.^2)/dx;
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
-
+                
                 dxu2=(uCentral(j,i+1)^2-uCentral(j,i)^2)/dx;
                 dudx2=(u(j,i+1,k-1)-2*u(j,i,k-1)+u(j,i-1,k-1))./dx^2;
                 dudy2=(u(j-1,i,k-1)-2*u(j,i,k-1)+u(j+1,i,k-1))./dy^2;
@@ -146,7 +173,7 @@ for k=2:TimeSteps
             if IsCenterX(j,i)==true %checks if node is central node
                 dxUstar(j,i)=(Ustar(j,i+1)^2-Ustar(j,i)^2)/dx; %is in cell center
             else %For Boundary Nodes
-                dxUstar(j,i)=0;
+                dxUstar(j,i)=1;
             end
         end
     end
@@ -156,7 +183,7 @@ for k=2:TimeSteps
             if IsCenterY(j,i)==true %checks if node is central node
                 dyVstar(j,i)=(Vstar(j+1,i)^2-Vstar(j,i)^2)/dy;
             else %For Boundary Nodes
-                dyVstar(j,i)=0;
+                dyVstar(j,i)=1;
             end
         end
     end
@@ -164,7 +191,7 @@ for k=2:TimeSteps
     dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
     ConstantMat=(duStarCentral+dvStarCentral)./dt;
     P(:,:,k)=PoisonPressure(ConstantMat,IsCenterP,P0,dx,dy,SOR);
-    P0=P(:,:,k);
+    %     P0=P(:,:,k);
     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k),uXlocations,uYlocations);
     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k),vXlocations,vYlocations);
     for i = 1:xEnd-1
@@ -174,10 +201,11 @@ for k=2:TimeSteps
             else %For Boundary Nodes
                 if j==1
                     u(j,i,k)=-u(2,i,k-1);
+                    %                 elseif j==uSize(1) && i~=uSize(2) && i~=1
                 elseif j==uSize(1)
                     u(j,i,k)=2-u(uSize(1)-1,i,k-1);
                 else
-                    u(j,i)=0;
+                    u(j,i,k)=0;
                 end
                 
             end
@@ -191,23 +219,27 @@ for k=2:TimeSteps
             else %For Boundary Nodes
                 if i==1
                     v(j,i,k)=-v(j,2,k-1);
-                elseif i==uSize(2)
+                elseif i==vSize(2)
                     v(j,i,k)=-v(j,vSize(2)-1,k-1);
                 else
                     v(j,i,k)=0;
                 end
                 
-
+                
             end
             
         end
     end
-%       u(uSize(1),:,k)=2-u(uSize(1)-1,:,k); 
-%      u(1,:,k)=-u(2,:,k);
-%     v(:,1,k)=-v(:,2,k);
-%     v(:,vSize(2),k)=-v(:,vSize(2)-1,k);
-%     u(:,:,k+1)=u(:,:,k);
-%     v(:,:,k+1)=v(:,:,k);
+    u(:,:,k+1)=u(:,:,k);
+    v(:,:,k+1)=v(:,:,k);
+    P(:,:,k+1)=P0;
+    %     P(:,:,k+1)=P0;
+    %       u(uSize(1),:,k)=2-u(uSize(1)-1,:,k);
+    %      u(1,:,k)=-u(2,:,k);
+    %     v(:,1,k)=-v(:,2,k);
+    %     v(:,vSize(2),k)=-v(:,vSize(2)-1,k);
+    %     u(:,:,k+1)=u(:,:,k);
+    %     v(:,:,k+1)=v(:,:,k);
 end
 %% Plotting
 figure;
