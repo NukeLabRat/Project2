@@ -2,12 +2,12 @@
 
 % Dan Gould
 
-% close all
+ close all
 clear
 clc
 
 Re=1;
-dt=.5;
+dt=.00005;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -98,7 +98,7 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
 end
 
 
-TimeSteps=10;
+TimeSteps=30;
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
@@ -111,7 +111,7 @@ dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 SOR=1;
 %     u(1,:,k)=-u(2,:,k-1);
 %     u(uSize(1),:,k)=2-u(uSize(1)-1,:,k-1);
-%     v(:,2,k)=-v(:,2,k-1);
+%     v(:,1,k)=-v(:,2,k-1);
 %     v(:,vSize(2),k)=-v(:,vSize(2)-1,k-1);
 for k=2:TimeSteps
     
@@ -128,9 +128,10 @@ for k=2:TimeSteps
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
+                uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations(j,i),pYlocations(j,i));
                 dxu2=(uCentral(j,i+1)^2-uCentral(j,i)^2)/dx;
-                dudx2=(u(j,i+1,k)-2*u(j,i,k)+u(j,i-1,k))./dx^2;
-                dudy2=(u(j-1,i,k)-2*u(j,i)+u(j+1,i,k))./dy^2;
+                dudx2=(u(j,i+1,k-1)-2*u(j,i,k)+u(j,i-1,k-1))./dx^2;
+                dudy2=(u(j-1,i,k-1)-2*u(j,i)+u(j+1,i,k-1))./dy^2;
                 Ustar(j,i) = (-dxu2-uvdy(j,i)+1./Re.*(dudx2+dudy2)).*dt+u(j,i,k);
             else %For Boundary Nodes
                 Ustar(j,i)=1;
@@ -141,10 +142,11 @@ for k=2:TimeSteps
     for i = 1:xEnd
         for j = 1:yEnd-1
             if IsCenterY(j,i)==true %checks if node is central node
-                dyv2=(vCentral(j+1,i)^2-vCentral(j,i)^2)/dy;
-                dvdx2=(v(j,i+1,k)-2*v(j,i)+v(j,i-1,k))./dx^2;
-                dvdy2=(v(j-1,i,k)-2*v(j,i)+v(j+1,i,k))./dy^2;
-                Vstar(j,i) = (-dyv2-uvdx(j,i)+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i,k);
+                vCentral=interp2(vXlocations,vYlocations,v(:,:,k-1),pXlocations(j,i),pYlocations(j,i));
+                dyv2=(vCentral^2-vCentral^2)/dy;
+                dvdx2=(v(j,i+1,k-1)-2*v(j,i)+v(j,i-1,k-1))./dx^2;
+                dvdy2=(v(j-1,i,k-1)-2*v(j,i)+v(j+1,i,k-1))./dy^2;
+                Vstar(j,i) = (-dyv2-uvdx(j,i)+1./Re.*(dvdx2+dvdy2)).*dt+v(j,i,k-1);
             else %For Boundary Nodes
                 
                 Vstar(j,i) =1;
@@ -178,8 +180,8 @@ for k=2:TimeSteps
     ConstantMat=(duStarCentral+dvStarCentral)./dt;
     P(:,:,k)=PoisonPressure(ConstantMat,IsCenterP,P0,dx,dy,SOR);
     P0=P(:,:,k);
-    PinterpU=interp2(pXlocations,pYlocations,p(:,:,k),uXlocations,uYlocations);
-    PinterpV=interp2(pXlocations,pYlocations,p(:,:,k),vXlocations,vYlocations);
+    PinterpU=interp2(pXlocations,pYlocations,P(:,:,k),uXlocations,uYlocations);
+    PinterpV=interp2(pXlocations,pYlocations,P(:,:,k),vXlocations,vYlocations);
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
@@ -215,18 +217,37 @@ for k=2:TimeSteps
             
         end
     end
+%       u(uSize(1),:,k)=2-u(uSize(1)-1,:,k); 
+%      u(1,:,k)=-u(2,:,k);
+%     v(:,1,k)=-v(:,2,k);
+%     v(:,vSize(2),k)=-v(:,vSize(2)-1,k);
+%     u(:,:,k+1)=u(:,:,k);
+%     v(:,:,k+1)=v(:,:,k);
 end
 %% Plotting
 figure;
-pcolor(uXlocations(2:end-1,2:end-1), uYlocations(2:end-1,2:end-1),P(2:end-1,2:end-1,k));
-axes3 = gca;
-box(axes3,'on');
-set(axes3,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+pcolor(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),P(2:end-1,2:end-1,k));
+axes1 = gca;
+box(axes1,'on');
+set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+title('P')
+axes1.YDir='normal';
+colorbar
+
+figure;
+pcolor(uXlocations(2:end-1,:),uYlocations(2:end-1,:),u(2:end-1,:,k));
+axes1 = gca;
+box(axes1,'on');
+set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
 title('u')
-axes2=gca;
-axes2.YDir='normal';
+axes1.YDir='normal';
+colorbar
 
-
-
-
-Ustar=3
+figure;
+pcolor(vYlocations(:,2:end-1), vXlocations(:,2:end-1),v(:,2:end-1,k));
+axes1 = gca;
+box(axes1,'on');
+set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+colorbar
+title('v')
+axes1.YDir='normal';

@@ -2,12 +2,12 @@
 
 % Dan Gould
 
-% close all
+ close all
 clear
 clc
 
 Re=1;
-dt=.5;
+dt=.0005;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -98,7 +98,7 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
 end
 
 
-TimeSteps=10;
+TimeSteps=6;
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
@@ -109,12 +109,13 @@ dyVstar(:,:,1)=ones(vSize(1),vSize(2));
 duStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 SOR=1;
+%     u(1,:,k)=-u(2,:,k-1);
+%     u(uSize(1),:,k)=2-u(uSize(1)-1,:,k-1);
+%     v(:,1,k)=-v(:,2,k-1);
+%     v(:,vSize(2),k)=-v(:,vSize(2)-1,k-1);
 for k=2:TimeSteps
     
-    u(1,:,k)=-u(2,:,k-1);
-    u(uSize(1),:,k)=2-u(uSize(1)-1,:,k-1);
-    v(:,2,k)=-v(:,2,k-1);
-    v(:,vSize(2),k)=-v(:,vSize(2)-1,k-1);
+
     
     
     uCentral=interp2(uXlocations,uYlocations,u(:,:,k-1),pXlocations,pYlocations);
@@ -177,17 +178,17 @@ for k=2:TimeSteps
     ConstantMat=(duStarCentral+dvStarCentral)./dt;
     P(:,:,k)=PoisonPressure(ConstantMat,IsCenterP,P0,dx,dy,SOR);
     P0=P(:,:,k);
-    PinterpU=interp2(pXlocations,pYlocations,p(:,:,k),uXlocations,uYlocations);
-    PinterpV=interp2(pXlocations,pYlocations,p(:,:,k),vXlocations,vYlocations);
+    PinterpU=interp2(pXlocations,pYlocations,P(:,:,k),uXlocations,uYlocations);
+    PinterpV=interp2(pXlocations,pYlocations,P(:,:,k),vXlocations,vYlocations);
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
                 u(j,i,k) = Ustar(j,i)+dt/dx*(PinterpU(j,i+1)-PinterpU(j,i));
             else %For Boundary Nodes
                 if j==1
-                    u(j,i,k)=-u(2,:,k-1);
+                    u(j,i,k)=-u(2,i,k-1);
                 elseif j==uSize(1)
-                    u(j,i,k)=2-u(uSize(1)-1,:,k-1);
+                    u(j,i,k)=2-u(uSize(1)-1,i,k);
                 else
                     u(j,i)=0;
                 end
@@ -202,9 +203,9 @@ for k=2:TimeSteps
                 v(j,i,k) = Vstar(j,i)+dt/dy*(PinterpV(j+1,i)-PinterpV(j,i));
             else %For Boundary Nodes
                 if i==1
-                    v(j,i,k)=-v(2,:,k-1);
+                    v(j,i,k)=-v(j,2,k-1);
                 elseif i==uSize(2)
-                    u(j,i,k)=-v(vSize(2)-1,:,k-1);
+                    u(j,i,k)=-v(j,vSize(2)-1,k);
                 else
                     v(j,i,k)=0;
                 end
@@ -214,18 +215,38 @@ for k=2:TimeSteps
             
         end
     end
+      u(uSize(1),:,k)=2-u(uSize(1)-1,:,k); 
+     u(1,:,k)=-u(2,:,k);
+ 
+    v(:,1,k)=-v(:,2,k);
+    v(:,vSize(2),k)=-v(:,vSize(2)-1,k);
+%     u(:,:,k+1)=u(:,:,k);
+%     v(:,:,k+1)=v(:,:,k);
 end
 %% Plotting
 figure;
-pcolor(uXlocations(2:end-1,2:end-1), uYlocations(2:end-1,2:end-1),P(2:end-1,2:end-1,k));
-axes3 = gca;
-box(axes3,'on');
-set(axes3,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+pcolor(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),P(2:end-1,2:end-1,k));
+axes1 = gca;
+box(axes1,'on');
+set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+title('P')
+axes1.YDir='normal';
+colorbar
+
+figure;
+pcolor(uXlocations(2:end-1,:),uYlocations(2:end-1,:),u(2:end-1,:,k));
+axes1 = gca;
+box(axes1,'on');
+set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
 title('u')
-axes2=gca;
-axes2.YDir='normal';
+axes1.YDir='normal';
+colorbar
 
-
-
-
-Ustar=3
+figure;
+pcolor(vYlocations(:,2:end-1), vXlocations(:,2:end-1),v(:,2:end-1,k));
+axes1 = gca;
+box(axes1,'on');
+set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+colorbar
+title('v')
+axes1.YDir='normal';
