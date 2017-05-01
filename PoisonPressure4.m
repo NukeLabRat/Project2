@@ -1,4 +1,4 @@
-function [ Pressure, Iterations] = PoisonPressure3( ConstantMat, IsCenterP, P0, dx, dy, Re, Uxx, Vyy)
+function [ Pressure, Iterations] = PoisonPressure4( ConstantMat, IsCenterP, P0, dx, dy, Re, Uxx, Vyy)
 %PoisonPressure Pressure solving function
 %   Itteratively solves for the pressure field durring each timestep. Gives
 %   back the pressure field in a matrix at locations given in NodeX and
@@ -17,20 +17,20 @@ while Error2>1E-8
         for j = 1:ySize
             if IsCenterP(j,i)==false %checks if node is central node
                 if j==1
-                    Pressure(j,i)=Pold(j+1,i);
-                    Pold(j,i)=Pold(j+1,i);
+                    Pressure(j,i)=Pold(j+1,i)+1/Re*Vyy(j+1,i);
+                    Pold(j,i)=Pold(j+1,i)+1/Re*Vyy(j+1,i);
                 end
                 if j==ySize
-                    Pressure(j,i)=Pold(j-1,i);
-                    Pold(j,i)=Pold(j-1,i);
+                    Pressure(j,i)=Pold(j-1,i)+1/Re*Vyy(j-1,i);
+                    Pold(j,i)=Pold(j-1,i)+1/Re*Vyy(j-1,i);
                 end
                 if i==1
-                    Pressure(j,i)=Pold(j,i+1);
-                    Pold(j,i)=Pold(j,i+1);
+                    Pressure(j,i)=Pold(j,i+1)+1/Re*Uxx(j,i+1);
+                    Pold(j,i)=Pold(j,i+1)+1/Re*Uxx(j,i+1);
                 end
                 if i==xSize
-                    Pressure(j,i)=Pold(j,i-1);
-                    Pold(j,i)=Pold(j,i-1);
+                    Pressure(j,i)=Pold(j,i-1)+1/Re*Uxx(j,i-1);
+                    Pold(j,i)=Pold(j,i-1)+1/Re*Uxx(j,i-1);
                 end
             end   
         end 
