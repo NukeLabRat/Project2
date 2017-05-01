@@ -33,18 +33,27 @@ while Error2>1E-8
             
             else %For Boundary Nodes
                 if i==1
-                    P(j,i-1)=Pold(j,i);
+                    Pwest=Pold(j,i);
+                else
+                    Pwest=P(j,i-1);
                 end
                 if i==xSize
-                    Pold(j,i+1)=Pold(j,i);
+                    Peast=Pold(j,i);
+                else
+                    Peast=Pold(j,i+1);
                 end
                 if j==1
-                    P(j-1,i)=Pold(j,i);
+                    Psouth=Pold(j,i);
+                else
+                    Psouth=P(j-1,i);
                 end
                 if j==ySize
-                    Pold(j+1,i)=Pold(j,i);
+                    Pnorth=Pold(j,i);
+                else
+                    Pnorth=Pold(j+1,i);
                 end
-            P(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Pold(j,i+1)+P(j,i-1)+Beta^2.*(Pold(j+1,i)+P(j-1,i))+dx^2.*ConstantMat(j,i))./(2*(1+Beta^2));
+                
+            P(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Peast+Pwest+Beta^2.*(Pnorth+Psouth)+dx^2.*ConstantMat(j,i))./(2*(1+Beta^2));
 
 %             P(j,i) = Pold(j,i);
                 
