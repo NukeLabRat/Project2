@@ -8,6 +8,8 @@ clc
 Re=100;
 dt=.1;
 TimeSteps=2;
+%% GPU
+G=gpuDevice;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -86,6 +88,7 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
     end
 end
 IsCenterP=logical(IsCenterP);
+IsC
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
@@ -177,12 +180,12 @@ while Error2>1E-4 || MainIterations<4
             end
         end
     end
-    ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
+    ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)+diff(Vstar(:,2:end-1),1,1))./dt,[1 1]);
     duStarCentral=interp2(uXlocations,uYlocations,dxUstar,pXlocations,pYlocations);
     dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
 %     ConstantMat=(duStarCentral+dvStarCentral)./dt;
-
-    [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy);
+IsCenterPgpu=gpuarray
+    [Pressure ~]=PoisonPressureGPU(ConstantMat,IsCenterP,P0,dx,dy);
     P(:,:,k+1)=Pressure;
     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k),uXlocations,uYlocations);
     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k),vXlocations,vYlocations);

@@ -12,7 +12,7 @@ Beta=dx/dy;
 % ConstantMat(isnan(ConstantMat))=0;
 Pold=P0;
 Pressure=Pold;
-while Error2>1E-6
+while Error2>1E-8
     for i = 1:xSize
         for j = 1:ySize
             if IsCenterP(j,i)==false %checks if node is central node

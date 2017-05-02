@@ -5,16 +5,16 @@ close all
 clear
 clc
 
-Re=10;
-dt=5E-3;
+Re=300;
+dt=.001;
 TimeSteps=2;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
 
 %%
-dx = 0.05; %m
-dy = 0.05; %m
+dx = .05; %m
+dy = .05; %m
 Beta = dx/dy;
 
 x = 0:dx:W; %vector of node locations; x-dir
@@ -98,23 +98,22 @@ duStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 SOR=1;
 
-% for i = 1:xEnd-1
-%     for j = 1:yEnd
-%         if IsCenterX(j,i)==true %checks if node is central node
-%         else %For Boundary Nodes
-%             if j==1
-%                 u(j,i,1)=-u(2,i,1)/2;
-%             elseif j==uSize(1)
-%                 u(j,i,1)=2-u(uSize(1)-1,i,1);
-%             else
-%                 u(j,i,1)=1;
-%             end
-%         end
-%     end
-% end
-% 
-% u(11,:,1)=1;
-% u(12,:,1)=1;
+for i = 1:xEnd-1
+    for j = 1:yEnd
+        if IsCenterX(j,i)==true %checks if node is central node
+        else %For Boundary Nodes
+            if j==1
+                u(j,i,2)=-u(2,i,2)/2;
+            elseif j==uSize(1)
+                u(j,i,2)=2-u(uSize(1)-1,i,2);
+            else
+                u(j,i,2)=0;
+            end
+        end
+    end
+end
+
+
 Error2=1;
 MainIterations=1;
 while Error2>1E-4 || MainIterations<4
@@ -122,7 +121,8 @@ while Error2>1E-4 || MainIterations<4
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
     k=1;
-    
+    unow=u(:,:,1);
+    vnow=v(:,:,1);
     uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
     vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
     uvdy=(interp2(uXlocations,uYlocations,u(:,:,k),uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k),uXlocations,uYlocations+.5*dy)...
@@ -177,15 +177,15 @@ while Error2>1E-4 || MainIterations<4
             end
         end
     end
-    ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)+diff(Vstar(:,2:end-1),1,1))./dt,[1 1]);
+    ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
     duStarCentral=interp2(uXlocations,uYlocations,dxUstar,pXlocations,pYlocations);
     dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
 %     ConstantMat=(duStarCentral+dvStarCentral)./dt;
 
     [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy);
     P(:,:,k+1)=Pressure;
-    PinterpU=interp2(pXlocations,pYlocations,P(:,:,k),uXlocations,uYlocations);
-    PinterpV=interp2(pXlocations,pYlocations,P(:,:,k),vXlocations,vYlocations);
+    PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
+    PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
