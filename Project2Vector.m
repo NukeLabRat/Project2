@@ -5,16 +5,17 @@ close all
 clear
 clc
 
-Re=100;
-dt=.1;
+Re=200;
+dt=.006;
 TimeSteps=2;
+Nodes=30;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
 
 %%
-dx = 1/6; %m
-dy = 1/6; %m
+dx = 1/(Nodes-1); %m
+dy = 1/(Nodes-1); %m
 Beta = dx/dy;
 
 x = 0:dx:W; %vector of node locations; x-dir
@@ -86,6 +87,89 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
     end
 end
 IsCenterP=logical(IsCenterP);
+TopWallP=false(pSize);
+BottomWallP=false(pSize);
+RightWallP=false(pSize);
+LeftWallP=false(pSize);
+    for i = 1:xEnd
+        for j = 1:yEnd
+            if IsCenterP(j,i)==false %checks if node is central node
+                if j==1
+                    BottomWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j+1,i);
+                end
+                if j==yEnd
+                    TopWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j-1,i);
+                end
+                if i==1
+                    LeftWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j,i+1);
+                end
+                if i==xEnd
+                    RightWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j,i-1);
+                end
+            end   
+        end 
+    end 
+    PoissonIn.Jminus=[];
+    PoissonIn.Jplus=[];
+    PoissonIn.Iminus=[];
+    PoissonIn.Iplus=[];
+    PoissonIn.Center=[];
+    
+     for i = 1:xEnd
+        for j = 1:yEnd
+            if IsCenterP(j,i)==true
+  PoissonIn.Center(end+1)=sub2ind([yEnd xEnd],j,i);              
+  PoissonIn.Jminus(end+1)=sub2ind([yEnd xEnd],j-1,i);
+  PoissonIn.Jplus(end+1)=sub2ind([yEnd xEnd],j+1,i);
+  PoissonIn.Iminus(end+1)=sub2ind([yEnd xEnd],j,i-1);
+  PoissonIn.Iplus(end+1)=sub2ind([yEnd xEnd],j,i+1);
+            end
+        end 
+     end 
+     
+PoissonIn.IsCenterP=IsCenterP;
+PoissonIn.TopWallP=false(pSize);
+PoissonIn.BottomWallP=false(pSize);
+PoissonIn.RightWallP=false(pSize);
+PoissonIn.LeftWallP=false(pSize);
+PoissonIn.TopWallPmirror=false(pSize);
+PoissonIn.BottomWallPmirror=false(pSize);
+PoissonIn.RightWallPmirror=false(pSize);
+PoissonIn.LeftWallPmirror=false(pSize);
+
+    for i = 1:xEnd
+        for j = 1:yEnd
+            if IsCenterP(j,i)==false %checks if node is central node
+                if j==1
+                    PoissonIn.BottomWallP(j,i)=true;
+                    PoissonIn.BottomWallPmirror(j+1,i)=true;
+                end
+                if j==yEnd
+                    PoissonIn.TopWallP(j,i)=true;
+                    PoissonIn.TopWallPmirror(j-1,i)=true;
+                end
+                if i==1
+                    PoissonIn.LeftWallP(j,i)=true;
+                    PoissonIn.LeftWallPmirror(j,i+1)=true;
+                end
+                if i==xEnd
+                    PoissonIn.RightWallP(j,i)=true;
+                    PoissonIn.RightWallPmirror(j,i-1)=true;
+                end
+            end   
+        end 
+    end %Create 
+    
+
+PoissonIn.dx=dx;
+PoissonIn.dy=dy;
+PoissonIn.xSize=pSize(2);
+PoissonIn.ySize=pSize(1);
+
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
@@ -98,31 +182,31 @@ duStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 SOR=1;
 
-% for i = 1:xEnd-1
-%     for j = 1:yEnd
-%         if IsCenterX(j,i)==true %checks if node is central node
-%         else %For Boundary Nodes
-%             if j==1
-%                 u(j,i,1)=-u(2,i,1)/2;
-%             elseif j==uSize(1)
-%                 u(j,i,1)=2-u(uSize(1)-1,i,1);
-%             else
-%                 u(j,i,1)=1;
-%             end
-%         end
-%     end
-% end
-% 
-% u(11,:,1)=1;
-% u(12,:,1)=1;
+for i = 1:xEnd-1 %Assign velocity BC for initial Step
+    for j = 1:yEnd
+        if IsCenterX(j,i)==true %checks if node is central node
+        else %For Boundary Nodes
+            if j==1
+                u(j,i,2)=-u(2,i,2)/2;
+            elseif j==uSize(1)
+                u(j,i,2)=2-u(uSize(1)-1,i,2);
+            else
+                u(j,i,2)=0;
+            end
+        end
+    end
+end
+
+
 Error2=1;
 MainIterations=1;
-while Error2>1E-4 || MainIterations<4
+while Error2>1E-4 || MainIterations<1000
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
     k=1;
-    
+    unow=u(:,:,1);
+    vnow=v(:,:,1);
     uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
     vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
     uvdy=(interp2(uXlocations,uYlocations,u(:,:,k),uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k),uXlocations,uYlocations+.5*dy)...
@@ -177,15 +261,14 @@ while Error2>1E-4 || MainIterations<4
             end
         end
     end
-    ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
-    duStarCentral=interp2(uXlocations,uYlocations,dxUstar,pXlocations,pYlocations);
-    dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
-%     ConstantMat=(duStarCentral+dvStarCentral)./dt;
+    PoissonIn.ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
+    PoissonIn.P0=P(:,:,k);
 
-    [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy);
+    
+    [Pressure ~]=PoisonPressureVector(PoissonIn);
     P(:,:,k+1)=Pressure;
-    PinterpU=interp2(pXlocations,pYlocations,P(:,:,k),uXlocations,uYlocations);
-    PinterpV=interp2(pXlocations,pYlocations,P(:,:,k),vXlocations,vYlocations);
+    PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
+    PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
@@ -220,11 +303,8 @@ while Error2>1E-4 || MainIterations<4
     end
     Error2=norm(P(:,:,2)-P(:,:,1));
     MainIterations=MainIterations+1;
-    if MainIterations==300
-        Stop=1;
-    end
 %     P(:,:,k+1)=P(:,:,k);
-    
+%     CurrentTime=dt*MainIterations
 end
 %% Plotting
 figure;

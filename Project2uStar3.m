@@ -5,16 +5,17 @@ close all
 clear
 clc
 
-Re=300;
-dt=.001;
+Re=200;
+dt=.006;
 TimeSteps=2;
+Nodes=30;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
 
 %%
-dx = .05; %m
-dy = .05; %m
+dx = 1/(Nodes-1); %m
+dy = 1/(Nodes-1); %m
 Beta = dx/dy;
 
 x = 0:dx:W; %vector of node locations; x-dir
@@ -86,6 +87,12 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
     end
 end
 IsCenterP=logical(IsCenterP);
+TopWallP=false(pSize);
+BottomWallP=false(pSize);
+RightWallP=false(pSize);
+LeftWallP=false(pSize);
+
+IsCenterP=logical(IsCenterP);
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
@@ -98,7 +105,7 @@ duStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 SOR=1;
 
-for i = 1:xEnd-1
+for i = 1:xEnd-1 %Assign velocity BC for initial Step
     for j = 1:yEnd
         if IsCenterX(j,i)==true %checks if node is central node
         else %For Boundary Nodes
@@ -116,7 +123,7 @@ end
 
 Error2=1;
 MainIterations=1;
-while Error2>1E-4 || MainIterations<4
+while Error2>1E-4 || MainIterations<1000
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -220,11 +227,8 @@ while Error2>1E-4 || MainIterations<4
     end
     Error2=norm(P(:,:,2)-P(:,:,1));
     MainIterations=MainIterations+1;
-    if MainIterations==300
-        Stop=1;
-    end
 %     P(:,:,k+1)=P(:,:,k);
-    
+%     CurrentTime=dt*MainIterations
 end
 %% Plotting
 figure;

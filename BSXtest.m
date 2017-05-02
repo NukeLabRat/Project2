@@ -1,8 +1,8 @@
 % G=gpuDevice;
 Number=10;
 CpuTime=zeros(1,Number);
-x=rand(10);
-x2=rand(10);
+x=rand(2000);
+x2=rand(2000);
 
 for i=1:Number
 Time=tic;
@@ -19,9 +19,7 @@ Gres=zeros(size(x));
 for i=1:Number
 Time=tic;
 ResBSX=bsxfun(@minus,x2,x);
-ResSquared=bsxfun(@power,ResBSX,twos);
-ResSum=sum(sum(ResSquared));
-ResRoot=ResSum.^.5;
+NormBSX=norm(ResBSX,2);
 % ResRoot=bsxfun(@power,ResSquared,halves);
 bsxTime(i)=toc(Time);
 

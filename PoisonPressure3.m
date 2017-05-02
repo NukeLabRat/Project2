@@ -6,13 +6,13 @@ function [ Pressure, Iterations] = PoisonPressure3( ConstantMat, IsCenterP, P0, 
 
 Iterations = 0;
 Error2 = 1;
-SOR=1; %1.7189 is optimal value.
+SOR=1.45; %1.7189 is optimal value.
 Beta=dx/dy;
 [ySize, xSize] = size(IsCenterP);
 % ConstantMat(isnan(ConstantMat))=0;
 Pold=P0;
 Pressure=Pold;
-while Error2>1E-6
+while Error2>1E-8
     for i = 1:xSize
         for j = 1:ySize
             if IsCenterP(j,i)==false %checks if node is central node
@@ -47,7 +47,7 @@ while Error2>1E-6
         end
     end
     
-    Error2 = norm(Pressure-Pold); %Calculate norm 2 error
+    Error2 = norm(Pressure-Pold,'fro'); %Calculate norm 2 error
     if Iterations ==50000
         Stop=1;
     end
