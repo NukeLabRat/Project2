@@ -5,10 +5,10 @@ close all
 clear
 clc
 
-Re=200;
+Re=10;
 dt=.006;
 TimeSteps=2;
-Nodes=30;
+Nodes=20;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -200,7 +200,7 @@ end
 
 Error2=1;
 MainIterations=1;
-while Error2>1E-4 || MainIterations<1000
+while Error2>1E-4 || MainIterations<100
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -247,7 +247,7 @@ while Error2>1E-4 || MainIterations<1000
             if IsCenterX(j,i)==true %checks if node is central node
                 dxUstar(j,i)=(Ustar(j,i+1)-Ustar(j,i))/dx; %is in cell center
             else %For Boundary Nodes
-                dxUstar(j,i)=1;
+                dxUstar(j,i)=0;
             end
         end
     end
@@ -257,7 +257,7 @@ while Error2>1E-4 || MainIterations<1000
             if IsCenterY(j,i)==true %checks if node is central node
                 dyVstar(j,i)=(Vstar(j+1,i)-Vstar(j,i))/dy;
             else %For Boundary Nodes
-                dyVstar(j,i)=1;
+                dyVstar(j,i)=0;
             end
         end
     end
@@ -265,7 +265,7 @@ while Error2>1E-4 || MainIterations<1000
     PoissonIn.P0=P(:,:,k);
 
     
-    [Pressure ~]=PoisonPressureVector(PoissonIn);
+    [Pressure, PoissonIterations]=PoisonPressureSLOR2(PoissonIn);
     P(:,:,k+1)=Pressure;
     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);

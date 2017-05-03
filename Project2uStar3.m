@@ -5,10 +5,10 @@ close all
 clear
 clc
 
-Re=200;
+Re=10;
 dt=.006;
 TimeSteps=2;
-Nodes=30;
+Nodes=20;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir

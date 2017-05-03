@@ -20,9 +20,9 @@ while Error2>1E-2
     Pressure(Data.BottomWallP)=Pold(Data.BottomWallPmirror);
     Pressure(Data.LeftWallP)=Pold(Data.LeftWallPmirror);
     Pressure(Data.RightWallP)=Pold(Data.RightWallPmirror);
-
-    Pressure(Data.Center)= (BetaSquared.*(Pold(Data.Jplus)+Pold(Data.Jminus))+Pold(Data.Iplus)+Pold(Data.Iminus)-C)./(Divisor);
-
+    for i=1:length(Data.Center)
+    Pressure(Data.Center(i))= (BetaSquared.*(Pold(Data.Jplus(i))+Pold(Data.Jminus(i)))+Pold(Data.Iplus(i))+Pold(Data.Iminus(i))-C(i))./(Divisor);
+    end
     Error2 = norm(Pressure(Data.Center)-Pold(Data.Center),'fro'); %Calculate norm 2 error
     if Iterations ==50000
         Stop=1; %Place to put breakpoint when debugging.
