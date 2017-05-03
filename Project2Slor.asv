@@ -4,10 +4,11 @@
 close all
 clear
 clc
+StartTime=tic;
+Re=1000;
+dt=.1;
+Nodes=50;
 
-Re=100;
-dt=.006;
-Nodes=40;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -37,6 +38,14 @@ P0=P;
 NodesP = 1:numel(P);
 NodesX = 1:numel(uXlocations);
 NodesY = 1:numel(uXlocations);
+%% Stability
+Stab1=.25*dt*Re
+Stab2=dt/(Re*dx^2)
+
+if Stab1>.95 || Stab2>.25
+    error('Unstable')
+end
+
 %% Apply BC
 Pinitial = 0;
 BoundaryNodesP=MatEdges(P);
@@ -196,10 +205,10 @@ for i = 1:xEnd-1 %Assign velocity BC for initial Step
     end
 end
 
-
+TimeCheck=0;
 Error2=1;
 MainIterations=1;
-while Error2>1E-4 || MainIterations<100
+while Error2>1E-7 || MainIterations<10
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -302,33 +311,87 @@ while Error2>1E-4 || MainIterations<100
     end
     Error2=norm(P(:,:,2)-P(:,:,1));
     MainIterations=MainIterations+1;
-%     P(:,:,k+1)=P(:,:,k);
-%     CurrentTime=dt*MainIterations
+TimeCheck=TimeCheck+1;
+if TimeCheck==20;
+    clc
+    Stab1
+    Stab2
+    CurrentTime=dt*MainIterations
+    Error=Error2
+    TimeCheck=0;
 end
+end
+StopTime=toc(StartTime)
 %% Plotting
-figure;
-imagesc(P(2:end-1,2:end-1,2));
-axes1 = gca;
-box(axes1,'on');
-set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
-title('P')
-axes1.YDir='normal';
-colorbar
+% figure;
+% imagesc(P(2:end-1,2:end-1,2));
+% axes1 = gca;
+% box(axes3,'on');
+% set(axes3,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+% title('P')
+% axes3.YDir='normal';
+% colorbar
+
+uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
+vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
 
 figure;
-imagesc(u(2:end-1,:,2));
+imagesc(uCentral(2:end-1,2:end-1,2));
 axes1 = gca;
 box(axes1,'on');
 set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
 title('u')
 axes1.YDir='normal';
 colorbar
+y=1:Nodes;x=1:Nodes;
+% Horizontal grid
+for k = 1:length(y)
+line([x(1) x(end)], [y(k) y(k)],'Color',[0 0 0],'LineWidth',1)
+end
+% Vertical grid
+for k = 1:length(x)
+line([x(k) x(k)], [y(1) y(end)],'Color',[0 0 0],'LineWidth',1)
+end
+xlim([0 Nodes-1])
+ylim([0 Nodes-1])
+% NodeInterp=
+NodeLabelsNum=1:6:Nodes;
+NodeLabels=num2cell(NodeLabelsNum);
+for i=1:length(NodeLabels)
+NodeLabels{i}=num2str(NodeLabels{i});
+end
+set(axes1,'FontName','Times New Roman','FontSize',25,'Layer','top','LineWidth',3,'XTick',NodeLabelsNum,...
+    'XTickLabel',NodeLabels,'YTick',NodeLabelsNum,'YTickLabel',NodeLabels);
+xlabel('x')
+ylabel('y')
+axes1.TickLength=[0 0];
 
 figure;
 imagesc(v(:,2:end-1,2));
-axes1 = gca;
-box(axes1,'on');
-set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
+axes2 = gca;
+box(axes2,'on');
+set(axes2,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
 colorbar
 title('v')
-axes1.YDir='normal';
+axes2.YDir='normal';
+y=1:Nodes;x=1:Nodes;
+% Horizontal grid
+for k = 1:length(y)
+line([x(1) x(end)], [y(k) y(k)],'Color',[0 0 0],'LineWidth',1)
+end
+% Vertical grid
+for k = 1:length(x)
+line([x(k) x(k)], [y(1) y(end)],'Color',[0 0 0],'LineWidth',1)
+end
+xlim([1 Nodes])
+ylim([1 Nodes])
+NodeLabelsNum=1:6:Nodes;
+NodeLabels=num2cell(1:6:Nodes);
+for i=1:length(NodeLabels)
+NodeLabels{i}=num2str(NodeLabels{i});
+end
+set(axes2,'FontName','Times New Roman','FontSize',25,'Layer','top','LineWidth',3,'XTick',NodeLabelsNum,...
+    'XTickLabel',NodeLabels,'YTick',NodeLabelsNum,'YTickLabel',NodeLabels);
+xlabel('x')
+ylabel('y')
+axes2.TickLength=[0 0];
