@@ -58,9 +58,9 @@ while Error2>1E-8
 %         Pressure(i,:) = ThomasMat(PressureMat,b);
 % %         Pressure(j,:) = PressureMat\b;         
 %     end
-   
+   OldError=Error2;
     Error2 = norm(Pressure-Pold,'fro'); %Calculate norm 2 error
-    if Iterations ==1500
+    if Iterations ==25 && OldError>Error2
         Stop=1; %Place to put breakpoint when debugging.
     end
     Pold=Pressure;

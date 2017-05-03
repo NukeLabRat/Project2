@@ -200,7 +200,7 @@ end
 
 Error2=1;
 MainIterations=1;
-while Error2>1E-4 || MainIterations<4
+while Error2>1E-4 || MainIterations<100
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -265,7 +265,7 @@ while Error2>1E-4 || MainIterations<4
     PoissonIn.P0=P(:,:,k);
 
     
-    [Pressure, PoissonIterations]=PoisonPressureSLOR2(PoissonIn);
+    [Pressure, PoissonIterations]=PoisonPressureSLOR3(PoissonIn);
     P(:,:,k+1)=Pressure;
     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);

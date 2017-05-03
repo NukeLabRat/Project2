@@ -16,7 +16,7 @@ Divisor=2.*BetaSquared+2;
 b = zeros(Data.xSize,1);
 PressureMat = Data.P0;
 Pold=Data.P0;
-SOR=.8;
+SOR=.7;
 while Error2>1E-8
     
     Pressure(Data.TopWallP)=Pold(Data.TopWallPmirror);
@@ -30,7 +30,7 @@ while Error2>1E-8
                 PressureMat(i,i) = Divisor;
                 PressureMat(i,i+1) = -SOR;
                 PressureMat(i,i-1) = -SOR;
-                b(i) = Divisor.*(1-SOR).*Pold(j,i)+SOR.*(Beta^2.*(Pold(j+1,i)+Pressure(j-1,i))+C(j,i));
+                b(i) = Divisor.*(1-SOR).*Pold(j,i)+SOR.*(Beta^2.*(Pold(j+1,i)+Pressure(j-1,i))-C(j,i));
             else
                 PressureMat(i,i) = 1;
                 b(i) = Pold(j,i);
@@ -40,14 +40,19 @@ while Error2>1E-8
         %         Pressure(j,:) = ThomasMat(PressureMat,b);
         Pressure(j,:) = PressureMat\b;
     end
-    
+        Pold=Pressure;
+    Pressure(Data.TopWallP)=Pold(Data.TopWallPmirror);
+    Pressure(Data.BottomWallP)=Pold(Data.BottomWallPmirror);
+    Pressure(Data.LeftWallP)=Pold(Data.LeftWallPmirror);
+    Pressure(Data.RightWallP)=Pold(Data.RightWallPmirror);
+        
     for i = 1:Data.xSize
         for j = 1:Data.ySize
             if Data.IsCenterP(j,i)==true
                 PressureMat(j,j) = Divisor;
                 PressureMat(j,j+1) = -SOR*BetaSquared;
                 PressureMat(j,j-1) = -SOR*BetaSquared;
-                b(j) = Divisor.*(1-SOR).*Pold(j,i)+SOR.*((Pold(j,i+1)+Pressure(j,i-1))+C(j,i));
+                b(j) = Divisor.*(1-SOR).*Pold(j,i)+SOR.*((Pold(j,i+1)+Pressure(j,i-1))-C(j,i));
             else
                 PressureMat(j,j) = 1;
                 b(j) = Pold(j,i);
@@ -58,8 +63,10 @@ while Error2>1E-8
         Pressure(:,i) = PressureMat\b;
     end
     
+    OldError=Error2;
     Error2 = norm(Pressure(Data.Center)-Pold(Data.Center),'fro'); %Calculate norm 2 error
-    if Iterations ==5000
+    
+    if Iterations >10 && Error2>OldError
         Stop=1; %Place to put breakpoint when debugging.
     end
     Pold=Pressure;

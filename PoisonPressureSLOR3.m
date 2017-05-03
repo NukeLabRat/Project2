@@ -1,4 +1,4 @@
-function [ Pressure, Iterations] = PoisonPressureSLOR2(Data)
+function [ Pressure, Iterations] = PoisonPressureSLOR3(Data)
 %PoisonPressure Pressure solving function
 %   Itteratively solves for the pressure field durring each timestep. Gives
 %   back the pressure field in a matrix at locations given in NodeX and
@@ -16,7 +16,7 @@ Divisor=2.*BetaSquared+2;
 b = zeros(Data.xSize,1);
 PressureMat = Data.P0;
 Pold=Data.P0;
-SOR=.6;
+SOR=1.1;
 while Error2>1E-8
     
     Pressure(Data.TopWallP)=Pold(Data.TopWallPmirror);
