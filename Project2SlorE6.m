@@ -5,9 +5,9 @@ close all
 clear
 clc
 StartTime=tic;
-Re=1000;
-dt=.0025;
-Nodes=129;
+Re=400;
+dt=.0075;
+Nodes=100;
 
 %% Geometry -
 L = 1; %m, y-dir
@@ -331,12 +331,12 @@ StopTime=toc(StartTime)
 % title('P')
 % axes3.YDir='normal';
 % colorbar
-save('Re1000Nodes200ErrorE7.mat','u','v','P','Error2','dt','dx','P0','Re')
+% save('Re1000Nodes200ErrorE5.mat','u','v','P','Error2','dt','dx','P0','Re')
 uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
 vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
 
 figure;
-imagesc(uCentral(2:end-1,2:end-1,2));
+imagesc(uCentral(2:end-1,2:end-1));
 axes1 = gca;
 box(axes1,'on');
 set(axes1,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
@@ -367,7 +367,7 @@ ylabel('y')
 axes1.TickLength=[0 0];
 
 figure;
-imagesc(v(:,2:end-1,2));
+imagesc(vCentral(:,2:end-1));
 axes2 = gca;
 box(axes2,'on');
 set(axes2,'FontName','Times New Roman','FontSize',25,'LineWidth',3)

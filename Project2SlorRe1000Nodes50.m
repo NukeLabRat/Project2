@@ -7,7 +7,7 @@ clc
 StartTime=tic;
 Re=1000;
 dt=.0025;
-Nodes=129;
+Nodes=100;
 
 %% Geometry -
 L = 1; %m, y-dir
@@ -208,7 +208,7 @@ end
 TimeCheck=0;
 Error2=1;
 MainIterations=1;
-while Error2>5E-6 || MainIterations<10000
+while Error2>1E-7 || MainIterations<10
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -331,7 +331,7 @@ StopTime=toc(StartTime)
 % title('P')
 % axes3.YDir='normal';
 % colorbar
-save('Re1000Nodes200ErrorE7.mat','u','v','P','Error2','dt','dx','P0','Re')
+
 uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
 vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
 

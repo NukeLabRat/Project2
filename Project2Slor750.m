@@ -5,8 +5,8 @@ close all
 clear
 clc
 StartTime=tic;
-Re=1000;
-dt=.0025;
+Re=750;
+dt=.0035;
 Nodes=129;
 
 %% Geometry -
