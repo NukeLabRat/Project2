@@ -123,7 +123,7 @@ end
 
 Error2=1;
 MainIterations=1;
-while Error2>1E-4 || MainIterations<1000
+while Error2>1E-4 || MainIterations<100
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -170,7 +170,7 @@ while Error2>1E-4 || MainIterations<1000
             if IsCenterX(j,i)==true %checks if node is central node
                 dxUstar(j,i)=(Ustar(j,i+1)-Ustar(j,i))/dx; %is in cell center
             else %For Boundary Nodes
-                dxUstar(j,i)=1;
+                dxUstar(j,i)=0;
             end
         end
     end
@@ -180,7 +180,7 @@ while Error2>1E-4 || MainIterations<1000
             if IsCenterY(j,i)==true %checks if node is central node
                 dyVstar(j,i)=(Vstar(j+1,i)-Vstar(j,i))/dy;
             else %For Boundary Nodes
-                dyVstar(j,i)=1;
+                dyVstar(j,i)=0;
             end
         end
     end

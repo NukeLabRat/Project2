@@ -1,4 +1,4 @@
-function [ Pressure, Iterations] = PoisonPressureSLOR2(Data)
+function [ Pressure, Iterations] = PoisonPressureADI(Data)
 %PoisonPressure Pressure solving function
 %   Itteratively solves for the pressure field durring each timestep. Gives
 %   back the pressure field in a matrix at locations given in NodeX and
@@ -37,12 +37,27 @@ while Error2>1E-8
             end
             
         end
-%         Pressure(j,:) = ThomasMat(PressureMat,b);
-        Pressure(j,:) = PressureMat\b;         
+        %         Pressure(j,:) = ThomasMat(PressureMat,b);
+        Pressure(j,:) = PressureMat\b;
     end
     
+    for i = 1:Data.xSize
+        for j = 1:Data.ySize
+            if Data.IsCenterP(j,i)==true
+                PressureMat(j,j) = Divisor;
+                PressureMat(j,j+1) = -SOR*BetaSquared;
+                PressureMat(j,j-1) = -SOR*BetaSquared;
+                b(j) = Divisor.*(1-SOR).*Pold(j,i)+SOR.*((Pold(j,i+1)+Pressure(j,i-1))+C(j,i));
+            else
+                PressureMat(j,j) = 1;
+                b(j) = Pold(j,i);
+            end
+            
+        end
+        %         Pressure(j,:) = ThomasMat(PressureMat,b);
+        Pressure(:,i) = PressureMat\b;
+    end
     
-   
     Error2 = norm(Pressure(Data.Center)-Pold(Data.Center),'fro'); %Calculate norm 2 error
     if Iterations ==5000
         Stop=1; %Place to put breakpoint when debugging.

@@ -37,12 +37,7 @@ while Error2>1E-8
     end
 
     for i = (1:xSize)
-        if i==3
-            st=3;
-        end
-            
         for j = (1:ySize)
-            
             if IsCenterP(j,i)==true %checks if node is central node
 %                  RHS=P(j,i-1)/dx^2-ConstantMat(j,i)+(P(j-1,i)+P(j+1,i))/dy^2+P(j,i+1)/dx^2;
 %                  P(j,i)=RHS/(1/dx^2+2/dy^2+1/dx^2);

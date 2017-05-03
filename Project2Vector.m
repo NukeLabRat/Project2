@@ -200,7 +200,7 @@ end
 
 Error2=1;
 MainIterations=1;
-while Error2>1E-4 || MainIterations<100
+while Error2>1E-4 || MainIterations<4
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
