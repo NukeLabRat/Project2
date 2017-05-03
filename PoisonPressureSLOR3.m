@@ -16,8 +16,8 @@ Divisor=2.*BetaSquared+2;
 b = zeros(Data.xSize,1);
 PressureMat = Data.P0;
 Pold=Data.P0;
-SOR=.6;
-while Error2>5E-7
+SOR=Data.SOR;
+while Error2>Data.Error
     
     Pressure(Data.TopWallP)=Pold(Data.TopWallPmirror);
     Pressure(Data.BottomWallP)=Pold(Data.BottomWallPmirror);

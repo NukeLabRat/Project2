@@ -1,12 +1,11 @@
 close all
 figure;
 [phi, psi]=flowfun(uCentral(2:end-1,2:end-1),vCentral(2:end-1,2:end-1));
-% contour(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),psi,20,'LineWidth',3,'LineColor',[0 0 1]);
-imagesc(uCentral(2:end-1,:));
+contour(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),psi,30,'LineWidth',3);
 axes3 = gca;
 box(axes3,'on');
 set(axes3,'FontName','Times New Roman','FontSize',25,'LineWidth',3)
-title('\psi')
+title('u')
 axes3.YDir='normal';
 % colorbar
 % y=1:Nodes;x=1:Nodes;
@@ -26,13 +25,14 @@ NodeLabels=num2cell(NodeLabelsNum);
 for i=1:length(NodeLabels)
 NodeLabels{i}=num2str(NodeLabels{i});
 end
-set(axes3,'FontName','Times New Roman','FontSize',25,'Layer','top','LineWidth',3);
+set(axes3,'FontName','Times New Roman','FontSize',25,'Layer','top','LineWidth',3,'XTick',NodeLabelsNum,...
+'XTickLabel',NodeLabels,'YTick',NodeLabelsNum,'YTickLabel',NodeLabels);
 xlabel('x')
 ylabel('y')
 axes3.TickLength=[0 0];
 
 figure;
-imagesc(vCentral(:,2:end-1));
+contour(vCentral(:,2:end-1),'LineWidth',3);
 axes2 = gca;
 box(axes2,'on');
 set(axes2,'FontName','Times New Roman','FontSize',25,'LineWidth',3)

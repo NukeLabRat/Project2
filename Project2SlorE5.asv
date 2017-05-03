@@ -10,7 +10,7 @@ dt=.004;
 Nodes=50;
 AllowedError=5E-8;
 PoissonIn.SOR=.95;
-PoissonIn.Error=5E-10;
+PoissonIn.Error=5E-9;
 
 %% Geometry -
 L = 1; %m, y-dir
@@ -243,7 +243,6 @@ while Error2>AllowedError || MainIterations<100
                 du2dy2=(u(j+1,i,k)-2*u(j,i,k)+u(j-1,i,k))./dy^2;
                 Ustar(j,i) = (-dxuSquared(j,i)-uvdy(j,i)+1./Re.*(du2dx2+du2dy2)).*dt+u(j,i,k);
             else %For Boundary Nodes
-%                 Ustar(j,i)=u(j,i,k)+.25*(u(j,i,k)+u(j,i,2))/2;
                 Ustar(j,i)=u(j,i,k);
 %                 Ustar(j,i)=0;
             end
@@ -257,7 +256,6 @@ while Error2>AllowedError || MainIterations<100
                 dv2dy2=(v(j-1,i,k)-2*v(j,i,k)+v(j+1,i,k))./dy^2;
                 Vstar(j,i) = (-dyvSquared(j,i)-uvdx(j,i)+1./Re.*(dv2dx2+dv2dy2)).*dt+v(j,i,k);
             else %For Boundary Nodes
-%                 Vstar(j,i) =v(j,i,1)+.25*(v(j,i,k)+v(j,i,2))/2;
                 Vstar(j,i) =v(j,i,1);
 %                 Vstar(j,i) =0;
             end
