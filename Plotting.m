@@ -1,7 +1,7 @@
 close all
 figure;
 [phi, psi]=flowfun(uCentral(2:end-1,2:end-1),vCentral(2:end-1,2:end-1));
-% contour(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),psi,20,'LineWidth',3,'LineColor',[0 0 1]);
+contour(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),psi,20,'LineWidth',3,'LineColor',[0 0 1]);
 imagesc(uCentral(2:end-1,:));
 axes3 = gca;
 box(axes3,'on');

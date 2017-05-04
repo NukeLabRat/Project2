@@ -93,12 +93,90 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
         end
     end
 end
+
 IsCenterP=logical(IsCenterP);
 TopWallP=false(pSize);
 BottomWallP=false(pSize);
 RightWallP=false(pSize);
 LeftWallP=false(pSize);
+    for i = 1:xEnd
+        for j = 1:yEnd
+            if IsCenterP(j,i)==false %checks if node is central node
+                if j==1
+                    BottomWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j+1,i);
+                end
+                if j==yEnd
+                    TopWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j-1,i);
+                end
+                if i==1
+                    LeftWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j,i+1);
+                end
+                if i==xEnd
+                    RightWallP(j,i)=true;
+%                     Pold(j,i)=Pold(j,i-1);
+                end
+            end   
+        end 
+    end 
+    PoissonIn.Jminus=[];
+    PoissonIn.Jplus=[];
+    PoissonIn.Iminus=[];
+    PoissonIn.Iplus=[];
+    PoissonIn.Center=[];
+    
+     for i = 1:xEnd
+        for j = 1:yEnd
+            if IsCenterP(j,i)==true
+  PoissonIn.Center(end+1)=sub2ind([yEnd xEnd],j,i);              
+  PoissonIn.Jminus(end+1)=sub2ind([yEnd xEnd],j-1,i);
+  PoissonIn.Jplus(end+1)=sub2ind([yEnd xEnd],j+1,i);
+  PoissonIn.Iminus(end+1)=sub2ind([yEnd xEnd],j,i-1);
+  PoissonIn.Iplus(end+1)=sub2ind([yEnd xEnd],j,i+1);
+            end
+        end 
+     end 
+     
+PoissonIn.IsCenterP=IsCenterP;
+PoissonIn.TopWallP=false(pSize);
+PoissonIn.BottomWallP=false(pSize);
+PoissonIn.RightWallP=false(pSize);
+PoissonIn.LeftWallP=false(pSize);
+PoissonIn.TopWallPmirror=false(pSize);
+PoissonIn.BottomWallPmirror=false(pSize);
+PoissonIn.RightWallPmirror=false(pSize);
+PoissonIn.LeftWallPmirror=false(pSize);
 
+    for i = 1:xEnd
+        for j = 1:yEnd
+            if IsCenterP(j,i)==false %checks if node is central node
+                if j==1
+                    PoissonIn.BottomWallP(j,i)=true;
+                    PoissonIn.BottomWallPmirror(j+1,i)=true;
+                end
+                if j==yEnd
+                    PoissonIn.TopWallP(j,i)=true;
+                    PoissonIn.TopWallPmirror(j-1,i)=true;
+                end
+                if i==1
+                    PoissonIn.LeftWallP(j,i)=true;
+                    PoissonIn.LeftWallPmirror(j,i+1)=true;
+                end
+                if i==xEnd
+                    PoissonIn.RightWallP(j,i)=true;
+                    PoissonIn.RightWallPmirror(j,i-1)=true;
+                end
+            end   
+        end 
+    end %Create 
+    
+
+PoissonIn.dx=dx;
+PoissonIn.dy=dy;
+PoissonIn.xSize=pSize(2);
+PoissonIn.ySize=pSize(1);
 IsCenterP=logical(IsCenterP);
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
@@ -196,7 +274,7 @@ while Error2>5E-7 || MainIterations<100
 %     dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
 %     ConstantMat=(duStarCentral+dvStarCentral)./dt;
 
-    [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy);
+    [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy,PoissonIn);
     P(:,:,k+1)=Pressure;
     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);

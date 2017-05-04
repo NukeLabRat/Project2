@@ -6,7 +6,7 @@ function [ Pressure, Iterations] = PoisonPressure3( ConstantMat, IsCenterP, P0, 
 
 Iterations = 0;
 Error2 = 1;
-SOR=1; %1.7189 is optimal value.
+SOR=1.3; %1.7189 is optimal value.
 Beta=dx/dy;
 [ySize, xSize] = size(IsCenterP);
 % ConstantMat(isnan(ConstantMat))=0;
