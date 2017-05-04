@@ -5,10 +5,13 @@ close all
 clear
 clc
 
-Re=400;
-dt=.0075;
+Re=10;
+dt=.0045;
 TimeSteps=2;
-Nodes=50;
+Nodes=6;
+PoissonIn.AllowedError=5E-8;
+MainAllowedError=5E-7;
+SORmain=1.1;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -205,10 +208,12 @@ for i = 1:xEnd-1 %Assign velocity BC for initial Step
     end
 end
 
+PressureIterations=zeros(10000,1);
 TimeCheck=0;
 Error2=1;
 MainIterations=1;
-while Error2>5E-7 || MainIterations<100
+StartingTime=tic;
+while Error2>MainAllowedError || MainIterations<100
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -231,7 +236,7 @@ while Error2>5E-7 || MainIterations<100
                 du2dy2=(u(j+1,i,k)-2*u(j,i,k)+u(j-1,i,k))./dy^2;
                 Ustar(j,i) = (-dxuSquared(j,i)-uvdy(j,i)+1./Re.*(du2dx2+du2dy2)).*dt+u(j,i,k);
             else %For Boundary Nodes
-                Ustar(j,i)=-u(j,i,k);
+                Ustar(j,i)=u(j,i,k);
 %                 Ustar(j,i)=0;
             end
             
@@ -244,18 +249,24 @@ while Error2>5E-7 || MainIterations<100
                 dv2dy2=(v(j-1,i,k)-2*v(j,i,k)+v(j+1,i,k))./dy^2;
                 Vstar(j,i) = (-dyvSquared(j,i)-uvdx(j,i)+1./Re.*(dv2dx2+dv2dy2)).*dt+v(j,i,k);
             else %For Boundary Nodes
-                Vstar(j,i) =-v(j,i,1);
+                Vstar(j,i) =v(j,i,1);
 %                 Vstar(j,i) =0;
             end
         end
     end
-    
-%     for i = 1:xEnd-1
+    if MainIterations<30
+        PoissonIn.SOR=.7;
+    else
+        PoissonIn.SOR=SORmain;
+    end
+
+    PoissonIn.ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
+%      for i = 1:xEnd-1
 %         for j = 1:yEnd
 %             if IsCenterX(j,i)==true %checks if node is central node
 %                 dxUstar(j,i)=(Ustar(j,i+1)-Ustar(j,i))/dx; %is in cell center
 %             else %For Boundary Nodes
-%                 dxUstar(j,i)=0;
+%                 dxUstar(j,i)=1;
 %             end
 %         end
 %     end
@@ -265,16 +276,15 @@ while Error2>5E-7 || MainIterations<100
 %             if IsCenterY(j,i)==true %checks if node is central node
 %                 dyVstar(j,i)=(Vstar(j+1,i)-Vstar(j,i))/dy;
 %             else %For Boundary Nodes
-%                 dyVstar(j,i)=0;
+%                 dyVstar(j,i)=1;
 %             end
 %         end
 %     end
-    ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
-%     duStarCentral=interp2(uXlocations,uYlocations,dxUstar,pXlocations,pYlocations);
-%     dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
-%     ConstantMat=(duStarCentral+dvStarCentral)./dt;
-
-    [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy,PoissonIn);
+%     
+%     Testd=(dxUstar+dyVstar)/dt;
+ 
+    [Pressure, PoissonIterations]=PoisonPressure5(IsCenterP,P0,dx,dy,PoissonIn);
+     PressureIterations(MainIterations)=PoissonIterations;
     P(:,:,k+1)=Pressure;
     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);
@@ -313,7 +323,7 @@ while Error2>5E-7 || MainIterations<100
     Error2=norm(u(:,:,2)-u(:,:,1));
     MainIterations=MainIterations+1;
 TimeCheck=TimeCheck+1;
-if TimeCheck==20;
+if TimeCheck==20
     clc
     Stab1
     Stab2
@@ -322,7 +332,14 @@ if TimeCheck==20;
     TimeCheck=0;
 end
 end
+OverallTime=toc(StartingTime)
+PressureIterations(PressureIterations==0)=[];
+
 %% Plotting
+uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
+vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
+
+
 figure;
 imagesc(P(2:end-1,2:end-1,2));
 axes1 = gca;

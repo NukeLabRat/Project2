@@ -5,8 +5,8 @@ close all
 clear
 clc
 
-Re=400;
-dt=.0075;
+Re=10;
+dt=.001;
 TimeSteps=2;
 Nodes=50;
 %% Geometry -
@@ -127,6 +127,7 @@ for i = 1:xEnd-1 %Assign velocity BC for initial Step
     end
 end
 
+StartingTime=tic;
 TimeCheck=0;
 Error2=1;
 MainIterations=1;
@@ -153,7 +154,7 @@ while Error2>5E-7 || MainIterations<100
                 du2dy2=(u(j+1,i,k)-2*u(j,i,k)+u(j-1,i,k))./dy^2;
                 Ustar(j,i) = (-dxuSquared(j,i)-uvdy(j,i)+1./Re.*(du2dx2+du2dy2)).*dt+u(j,i,k);
             else %For Boundary Nodes
-                Ustar(j,i)=-u(j,i,k);
+                Ustar(j,i)=u(j,i,k);
 %                 Ustar(j,i)=0;
             end
             
@@ -166,35 +167,15 @@ while Error2>5E-7 || MainIterations<100
                 dv2dy2=(v(j-1,i,k)-2*v(j,i,k)+v(j+1,i,k))./dy^2;
                 Vstar(j,i) = (-dyvSquared(j,i)-uvdx(j,i)+1./Re.*(dv2dx2+dv2dy2)).*dt+v(j,i,k);
             else %For Boundary Nodes
-                Vstar(j,i) =-v(j,i,1);
+                Vstar(j,i) =v(j,i,1);
 %                 Vstar(j,i) =0;
             end
         end
     end
     
-%     for i = 1:xEnd-1
-%         for j = 1:yEnd
-%             if IsCenterX(j,i)==true %checks if node is central node
-%                 dxUstar(j,i)=(Ustar(j,i+1)-Ustar(j,i))/dx; %is in cell center
-%             else %For Boundary Nodes
-%                 dxUstar(j,i)=0;
-%             end
-%         end
-%     end
-%     
-%     for i = 1:xEnd
-%         for j = 1:yEnd-1
-%             if IsCenterY(j,i)==true %checks if node is central node
-%                 dyVstar(j,i)=(Vstar(j+1,i)-Vstar(j,i))/dy;
-%             else %For Boundary Nodes
-%                 dyVstar(j,i)=0;
-%             end
-%         end
-%     end
+
     ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
-%     duStarCentral=interp2(uXlocations,uYlocations,dxUstar,pXlocations,pYlocations);
-%     dvStarCentral=interp2(vXlocations,vYlocations,dyVstar,pXlocations,pYlocations);
-%     ConstantMat=(duStarCentral+dvStarCentral)./dt;
+
 
     [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy);
     P(:,:,k+1)=Pressure;
@@ -244,6 +225,7 @@ if TimeCheck==20;
     TimeCheck=0;
 end
 end
+ComputationTime=toc(StartingTime)
 %% Plotting
 figure;
 imagesc(P(2:end-1,2:end-1,2));
