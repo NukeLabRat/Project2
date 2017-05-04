@@ -12,7 +12,7 @@ xlabel('x')
 ylabel('y')
 axes1.Color='none';
 figure
-contour(pXlocations,pYlocations,psi,20,'LineWidth',3);
+contour(pXlocations,pYlocations,psi,15,'LineWidth',3,'LineColor',[0 0 0]);
 colorbar
 axes4=gca;
 set(axes4,'FontName','Times New Roman','FontSize',28,'LineWidth',3);

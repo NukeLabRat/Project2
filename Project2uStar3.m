@@ -5,10 +5,10 @@ close all
 clear
 clc
 
-Re=10;
-dt=.001;
+Re=100;
+dt=.0022;
 TimeSteps=2;
-Nodes=50;
+Nodes=100;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -131,7 +131,7 @@ StartingTime=tic;
 TimeCheck=0;
 Error2=1;
 MainIterations=1;
-while Error2>5E-7 || MainIterations<100
+while Error2>5E-6 || MainIterations<100
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
