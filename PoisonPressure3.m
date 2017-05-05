@@ -1,4 +1,4 @@
-function [ Pressure, Iterations] = PoisonPressure3( ConstantMat, IsCenterP, P0, dx, dy)
+function [ Pressure, Iterations] = PoisonPressure3( ConstantMat, IsCenterP, P0, dx, dy, Data)
 %PoisonPressure Pressure solving function
 %   Itteratively solves for the pressure field durring each timestep. Gives
 %   back the pressure field in a matrix at locations given in NodeX and
@@ -12,7 +12,7 @@ Beta=dx/dy;
 % ConstantMat(isnan(ConstantMat))=0;
 Pold=P0;
 Pressure=Pold;
-while Error2>5E-7
+while Error2>Data.PoissonErrorMax
     for i = 1:xSize
         for j = 1:ySize
             if IsCenterP(j,i)==false %checks if node is central node

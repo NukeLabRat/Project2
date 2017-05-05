@@ -89,7 +89,7 @@ for i = 1:xEnd %This loop determines whether each node is central node or bounda
         if sum(ismember(CenterNodesP,IndexP(j,i)))==1
             IsCenterP(j,i) = true;
         else
-            IsCenterP(j,i) = false;
+            IsCenterP(j,i) = false;line([x(1) x(end)], [y(k) y(k)],'Color',[0 0 0],'LineWidth',1)
         end
     end
 end
@@ -98,6 +98,7 @@ TopWallP=false(pSize);
 BottomWallP=false(pSize);
 RightWallP=false(pSize);
 LeftWallP=false(pSize);
+
 
 IsCenterP=logical(IsCenterP);
 u=zeros(uSize(1),uSize(2),TimeSteps);
@@ -132,6 +133,11 @@ TimeCheck=0;
 Error2=1;
 MainIterations=1;
 while Error2>5E-6 || MainIterations<100
+    if Error2<5E-5
+        PoissonIn.PoissonErrorMax=1E-6;
+    else
+        PoissonIn.PoissonErrorMax=1E-3;
+    end
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -177,7 +183,7 @@ while Error2>5E-6 || MainIterations<100
     ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
 
 
-    [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy);
+    [Pressure ~]=PoisonPressure3(ConstantMat,IsCenterP,P0,dx,dy,PoissonIn);
     P(:,:,k+1)=Pressure;
     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);
