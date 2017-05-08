@@ -5,8 +5,8 @@ plt.rcParams['axes.linewidth'] = 2
 
 
 
-
-g = 40
+#%%
+g = 10
 u = np.zeros((g+1, g))
 un=np.zeros((g,g))
 vn=np.zeros((g,g))
@@ -15,7 +15,7 @@ p = np.zeros((g+1, g+1))
 dx = float(1.0/(g-1))
 dy = float(1.0/(g-1))
 
-Re = 1.0
+Re = 400
 #Time step selection
 fac=(1.0/(0.25*Re))
 fac2=(0.25*Re*dx**2)
@@ -23,7 +23,7 @@ if fac>fac2:
 	dt=fac2
 elif fac<=fac2:
 	dt=fac
-
+dt=.001
 
 #dt = 0.01
 
@@ -35,11 +35,12 @@ C=np.copy(p)
 F=np.zeros((g+1,g))
 G=np.zeros((g,g+1))
 error=1.0
-
+#%%
 t=0
 Tf=1000.0
 err=1
-while (t<=Tf) and (err>10**-5):
+counter=1
+while (t<=Tf) and (err>10**-5) and counter<3:
 	
     #print t
     #Boundary Values
@@ -67,10 +68,10 @@ while (t<=Tf) and (err>10**-5):
                 -(dt/dy)*(((v[j,i]+v[j,i+1])/2)*((u[j,i]+u[j+1,i])/2)-(((v[j-1,i]+v[j,i+1])/2)*((u[j-1,i]+u[j,i])/2)))
     #print u[-2,:]
     F[-1,:]=2-F[-2,:]
-    F[0,:]=-F[-1,:]
+    F[0,:]=-F[1,:]
     F[:,0]=0.0
     F[:,-1]=0.0
-    #print F   
+    print(F)   
 
     for j in range(1,g-1):
         for i in range(1,g):
@@ -123,6 +124,8 @@ while (t<=Tf) and (err>10**-5):
     		vn[j,i]=((v[j,i]+v[j,i+1]))/2
 
     err=LA.norm(np.sqrt(un**2+vn**2)-speed)
+    err=1E-8
+    counter=counter+1
     print("Error",err,"Time", t)
 
 

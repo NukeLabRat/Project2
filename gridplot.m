@@ -1,12 +1,12 @@
 for i=1:7
 for j=1:6
-Vtext{j,i}=['$$v_{' num2str(i-1) '\frac{1}{2},' num2str(j) '}$$'];
+Vtext{j,i}=['$$v_{' num2str(i-1) ',' num2str(j) '\frac{1}{2}}$$'];
 end
 end
 
 for i=1:6
 for j=1:7
-Utext{j,i}=['$$u_{' num2str(i) ',' num2str(j-1) '\frac{1}{2}}$$'];
+Utext{j,i}=['$$u_{' num2str(i) '\frac{1}{2},' num2str(j-1) '}$$'];
 end
 end
 
@@ -22,11 +22,12 @@ plot(uXlocations(1),uYlocations(1),'r.','MarkerSize',15,'DisplayName','u-velocit
 plot(vXlocations(1),vYlocations(1),'b.','MarkerSize',15)
 plot(pXlocations(1),pYlocations(1),'k.','MarkerSize',15)
 Axes1=gca;
-Legend1=legend(Axes1,'show');
+% Legend1=legend(Axes1,'show');
 
 set(Axes1, 'color', 'none');
-set(Legend1, 'color', 'none');
-box on
+Axes1.Visible='off';
+% set(Legend1, 'color', 'none');
+box off
 set(Axes1,'FontName','Times New Roman','FontSize',18,'LineWidth',3)
 line([0 1], [1 1],'Color',[81/255 40/255 136/255],'LineWidth',2)
 line([1 1], [0 1],'Color',[81/255 40/255 136/255],'LineWidth',2)

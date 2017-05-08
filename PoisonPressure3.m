@@ -41,7 +41,7 @@ while Error2>Data.PoissonErrorMax
             if IsCenterP(j,i)==true %checks if node is central node
 %                  RHS=P(j,i-1)/dx^2-ConstantMat(j,i)+(P(j-1,i)+P(j+1,i))/dy^2+P(j,i+1)/dx^2;
 %                  P(j,i)=RHS/(1/dx^2+2/dy^2+1/dx^2);
-                 Pressure(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Pold(j,i+1)+Pressure(j,i-1)+Beta^2.*(Pold(j+1,i)+Pressure(j-1,i))+dx^2.*ConstantMat(j,i))./(2*(1+Beta^2));
+                 Pressure(j,i) = (1-SOR).*Pold(j,i)+SOR.*(Pold(j,i+1)+Pressure(j,i-1)+Beta^2.*(Pold(j+1,i)+Pressure(j-1,i))-dx^2.*ConstantMat(j,i))./(2*(1+Beta^2));
                 
             end
         end
