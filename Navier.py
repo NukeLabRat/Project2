@@ -6,7 +6,7 @@ plt.rcParams['axes.linewidth'] = 2
 
 
 #%%
-g = 10
+g = 30
 u = np.zeros((g+1, g))
 un=np.zeros((g,g))
 vn=np.zeros((g,g))
@@ -22,13 +22,13 @@ fac2=(0.25*Re*dx**2)
 if fac>fac2:
 	dt=fac2
 elif fac<=fac2:
-	dt=fac
-dt=.001
+	dt=fac/1.05
+#dt=.008
 
 #dt = 0.01
 
 p[:,:]=1.0
-w = 1.5
+w = 1.65
 C=np.copy(p)
 
 
@@ -39,8 +39,8 @@ error=1.0
 t=0
 Tf=1000.0
 err=1
-counter=1
-while (t<=Tf) and (err>10**-5) and counter<3:
+MaxErr=10**-5
+while (t<=Tf) and (err>MaxErr):
 	
     #print t
     #Boundary Values
@@ -71,7 +71,7 @@ while (t<=Tf) and (err>10**-5) and counter<3:
     F[0,:]=-F[1,:]
     F[:,0]=0.0
     F[:,-1]=0.0
-    print(F)   
+
 
     for j in range(1,g-1):
         for i in range(1,g):
@@ -81,7 +81,7 @@ while (t<=Tf) and (err>10**-5) and counter<3:
                 -(dt/dx)*((((u[j,i]+u[j+1,i])/2)*((v[j,i]+v[j,i+1])/2))-(((u[j,i-1]+u[j+1,i-1])/2)*((v[j,i-1]+v[j,i])/2)))
     G[0,:]=0.0
     G[-1,:]=0.0
-    G[:,0]=-G[:,-1]
+    G[:,0]=-G[:,1]
     G[:,-1]=-G[:,-2]
     #C=[]
     temp=1
@@ -91,7 +91,8 @@ while (t<=Tf) and (err>10**-5) and counter<3:
     #print type(F)
     #print type(G)
     error = 1
-    while error > 10**-5:
+    PoissonErrorMax=MaxErr/3
+    while error > PoissonErrorMax:
         p[:,0] = p[:,1]
         p[:,-1] = p[:,-2]
         p[0,:] = p[1,:]
@@ -124,8 +125,7 @@ while (t<=Tf) and (err>10**-5) and counter<3:
     		vn[j,i]=((v[j,i]+v[j,i+1]))/2
 
     err=LA.norm(np.sqrt(un**2+vn**2)-speed)
-    err=1E-8
-    counter=counter+1
+ 
     print("Error",err,"Time", t)
 
 

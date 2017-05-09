@@ -15,26 +15,17 @@ xlabel('x')
 ylabel('y')
 axes1.Color='none';
 figure
-contour(pXlocations,pYlocations,psi,40,'LineWidth',3,'LineColor','b');
-[StreamX, StreamY]=meshgrid([dx .1 .15 .2 .85 .88 .9 .95],dy*ones(1,10));
-XY=stream2(pXlocations,pYlocations,uCentral,vCentral,StreamX,StreamY);
-StreamA=streamline(XY)
-% axes5=gca;
-% set(axes5,'FontName','Times New Roman','FontSize',28,'LineWidth',3)
-title('Streamlines')
-
-% colorbar
+contour(pXlocations,pYlocations,psi,80,'LineWidth',3);
+colorbar
 axes4=gca;
 set(axes4,'FontName','Times New Roman','FontSize',28,'LineWidth',3);
 xlabel('x')
 ylabel('y')
-% title('\psi')
+title('\psi')
 figure
 axes4.Color='none';
 pcolor(pXlocations(2:end-1,2:end-1),pYlocations(2:end-1,2:end-1),uCentral(2:end-1,2:end-1));
-for i=1:length(StreamA)
-StreamA(i).LineWidth=3;
-end
+
 axes3=gca;
 
 % % colorbar
@@ -107,11 +98,11 @@ xlabel('x')
 ylabel('y')
 axes2.TickLength=[0 0];
 
-% figure
-% [StreamX, StreamY]=meshgrid([dx .05 .1 .15 .2 .22 .85 .88 .9 .95],dy*ones(1,10));
-% XY=stream2(pXlocations,pYlocations,uCentral,vCentral,StreamX,StreamY);
-% streamline(XY)
-% axes5=gca;
-% set(axes2,'FontName','Times New Roman','FontSize',28,'LineWidth',3)
-% title('Streamlines')
+figure
+[StreamX, StreamY]=meshgrid(linspace(.5*dx,W-5*dx,10),fliplr(linspace(.5*dy,L-.5*dy,10));
+XY=stream2(pXlocations,pYlocations,uCentral,vCentral,StreamX,StreamY);
+streamline(XY)
+axes5=gca;
+set(axes2,'FontName','Times New Roman','FontSize',28,'LineWidth',3)
+title('Streamlines')
 

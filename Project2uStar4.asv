@@ -5,8 +5,8 @@ close all
 clear
 clc
 
-Re=100;
-dt=.0005;
+Re=400;
+dt=.008;
 TimeSteps=2;
 Nodes=65;
 %% Geometry -
@@ -102,9 +102,9 @@ PoissonIn.dx=dx;
 PoissonIn.dy=dy;
 PoissonIn.xSize=pSize(2);
 PoissonIn.ySize=pSize(1);
-IsCenterP=logical(IsCenterP);
 
-PoissonIn.IsCenterP=logical(IsCenterP);
+
+IsCenterP=logical(IsCenterP);
 u=zeros(uSize(1),uSize(2),TimeSteps);
 v=zeros(vSize(1),vSize(2),TimeSteps);
 P=zeros(pSize(1),pSize(2),TimeSteps);
@@ -112,7 +112,11 @@ ConstantMat=zeros(pSize(1),pSize(2));
 % ConstantMat2=zeros(pSize(1),pSize(2));
 Ustar(:,:,1)=zeros(uSize(1),uSize(2));
 Vstar(:,:,1)=zeros(vSize(1),vSize(2));
-PressureIterations=zeros(1,10000);
+% Vstar2(:,:,1)=zeros(vSize(1),vSize(2));
+% dxUstar(:,:,1)=ones(uSize(1),uSize(2));
+% dyVstar(:,:,1)=ones(vSize(1),vSize(2));
+% duStarCentral(:,:,1)=ones(pSize(1),pSize(2));
+% dvStarCentral(:,:,1)=ones(pSize(1),pSize(2));
 
 
 for i = 1:xEnd-1 %Assign velocity BC for initial Step
@@ -135,16 +139,24 @@ TimeCheck=0;
 Error2=1;
 MainIterations=1;
 while Error2>5E-7 || MainIterations<100
+%     if Error2<5E-6
+%         PoissonIn.PoissonErrorMax=1E-8;
+%     else
+%         if Error2<5E-5
+%             PoissonIn.PoissonErrorMax=1E-6;
+%         else
+%             PoissonIn.PoissonErrorMax=1E-5;
+%         end
+%     end
 PoissonIn.PoissonErrorMax=Error2/50;
     
     
     if Error2<.05
-        PoissonIn.SOR=1.2;
+        PoissonIn.SOR=1.5;
     else
-        PoissonIn.SOR=1;
+        PoisonIn.SOR=1;
     end
     
-
     u(:,:,1)=u(:,:,2);
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
@@ -152,15 +164,7 @@ PoissonIn.PoissonErrorMax=Error2/50;
     unow=u(:,:,1);
     vnow=v(:,:,1);
     pnow=P(:,:,1);
-%     uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
-%     vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
-% %     uvdy=(interp2(uXlocations,uYlocations,u(:,:,k),uXlocations,uYlocations+.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k),uXlocations,uYlocations+.5*dy)...
-%         -interp2(uXlocations,uYlocations,u(:,:,k),uXlocations,uYlocations-.5*dy).*interp2(vXlocations,vYlocations,v(:,:,k),uXlocations,uYlocations-.5*dy))/dy;
-%     uvdx=(interp2(uXlocations,uYlocations,u(:,:,k),vXlocations+.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k),vXlocations+.5*dx,vYlocations)...
-%         -interp2(uXlocations,uYlocations,u(:,:,k),vXlocations-.5*dx,vYlocations).*interp2(vXlocations,vYlocations,v(:,:,k),vXlocations-.5*dx,vYlocations))/dx;
-%     dxuSquared=(uCentral.^2-uCentral.^2)/dx;
-%     dyvSquared=(vCentral.^2-vCentral.^2)/dy;
-    
+
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
@@ -175,15 +179,7 @@ PoissonIn.PoissonErrorMax=Error2/50;
                 
                 
             else %For Boundary Nodes
-%                 if j==uSize(1)
-%                     Ustar(j,i)=2-Ustar(yEnd-1,i);
-% %                     Ustar2(j,i)=2-Ustar2(yEnd-1,i,k);
-%                 else
-%                     Ustar(j,i)=0;
-% %                     Ustar2(j,i)=0;
-%                 end
-                
-                %                 Ustar(j,i)=0;
+
             end
             
         end
@@ -192,16 +188,11 @@ PoissonIn.PoissonErrorMax=Error2/50;
     Ustar(1,:)=-Ustar(2,:);
     
     Ustar(uSize(1),:)=2-Ustar(yEnd-1,:);
-%       Ustar2(1,:)=-Ustar2(2,:);
-%     
-%     Ustar2(uSize(1),:)=2-Ustar2(uSize(1)-1,:);
+
     for i = 1:xEnd
         for j = 1:yEnd-1
             if IsCenterY(j,i)==true %checks if node is central node
-%                 dv2dx2=(v(j,i+1,k)-2*v(j,i,k)+v(j,i-1,k))./dx^2;
-%                 dv2dy2=(v(j+1,i,k)-2*v(j,i,k)+v(j-1,i,k))./dy^2;
-%                 Vstar(j,i) = (-dyvSquared(j,i)-uvdx(j,i)+1./Re.*(dv2dx2+dv2dy2)).*dt+v(j,i,k);
-                
+
                         	Vstar(j,i)=v(j,i,k)+((dt/(Re*dx^2))*(v(j,i+1,k)-2*v(j,i,k)+v(j,i-1,k)))...
                 +(((dt/(Re*dy^2)))*(v(j+1,i,k)-2*v(j,i,k)+v(j-1,i,k)))...
                 -(dt/dy)*(((v(j,i,k)+v(j+1,i,k))/2)^2-((v(j-1,i,k)+v(j,i,k))/2)^2)...
@@ -223,8 +214,8 @@ PoissonIn.PoissonErrorMax=Error2/50;
 %     Vstar(:,vSize(2))=-Vstar(:,vSize(2)-1);
 %     
 %     VstarNorm=norm(Vstar-Vstar2,inf)
-    PoissonIn.ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
-    PoissonIn.P0=P(:,:,k);
+    ConstantMat=padarray((diff(Ustar(2:end-1,:),1,2)/dx+diff(Vstar(:,2:end-1),1,1)/dy)./dt,[1 1]);
+    P0=P(:,:,k);
 %     for i = 2:Nodes
 %         for j = 2:Nodes
 % 
@@ -233,11 +224,10 @@ PoissonIn.PoissonErrorMax=Error2/50;
 %     end
     PoissonIn.Iterations=MainIterations;
 
-    [Pressure, PoissonIterations]=PoisonPressureSLOR4(PoissonIn);
-%     PressureIterations(MainIterations)=PoissonIterations;
+    [Pressure ~]=PoisonPressure6(ConstantMat,IsCenterP,P0,dx,dy,PoissonIn);
     P(:,:,k+1)=Pressure;
-    PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
-    PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);
+%     PinterpU=interp2(pXlocations,pYlocations,P(:,:,k+1),uXlocations,uYlocations);
+%     PinterpV=interp2(pXlocations,pYlocations,P(:,:,k+1),vXlocations,vYlocations);
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node
@@ -289,10 +279,7 @@ if TimeCheck==20;
     TimeCheck=0;
 end
 end
-uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
-vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations);
 ComputationTime=toc(StartingTime)
-PressureIterations(PressureIterations==0)=[];
 %% Plotting
 figure;
 imagesc(P(2:end-1,2:end-1,2));

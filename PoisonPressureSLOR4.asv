@@ -18,7 +18,7 @@ b = zeros(Data.xSize,1);
 PressureMat = zeros(Data.xSize,Data.xSize);
 Pold=Data.P0;
 SOR=Data.SOR;
-while Error2>Data.PoissonErrorMax
+while Error2>Data.Error
     
 %     Pressure(Data.TopWallP)=Pold(Data.TopWallPmirror);
 %     Pressure(Data.BottomWallP)=Pold(Data.BottomWallPmirror);

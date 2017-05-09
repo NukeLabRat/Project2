@@ -9,7 +9,6 @@ Error2 = 1;
 SOR=1; %1.7189 is optimal value.
 Beta=dx/dy;
 [ySize, xSize] = size(IsCenterP);
-% ConstantMat(isnan(ConstantMat))=0;
 Pold=P0;
 Pressure=Pold;
 % Pressure2=Pold;

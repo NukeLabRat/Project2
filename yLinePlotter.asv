@@ -1,0 +1,5 @@
+uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
+vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations); 
+yLines=2:7:51;
+figure
+plot(vCentral(:,yLines),pLocationsY(:,yLines))
