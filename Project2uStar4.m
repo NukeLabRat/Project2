@@ -5,10 +5,10 @@ close all
 clear
 clc
 
-Re=1000;
-dt=.0035;
+Re=3200;
+dt=1E-4;
 TimeSteps=2;
-Nodes=65;
+Nodes=50;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -127,10 +127,10 @@ StartingTime=tic;
 TimeCheck=0;
 Error2=1;
 MainIterations=1;
-while Error2>5E-6 || MainIterations<100
+while Error2>5E-5 || MainIterations<100
 PoissonIn.PoissonErrorMax=Error2/50;
     if Error2<.05
-        PoissonIn.SOR=1.4;
+        PoissonIn.SOR=1.1;
     else
         PoissonIn.SOR=1;
     end
@@ -259,7 +259,7 @@ title('v')
 axes1.YDir='normal';
 
 figure;
-imagesc(uCentralEnd(2:end-1,2:end-1).^2+vCentralEnd(2:end-1,2:end-1).^2).^.5;
+imagesc((uCentralEnd(2:end-1,2:end-1).^2+vCentralEnd(2:end-1,2:end-1).^2).^.5);
 axes4 = gca;
 box(axes4,'on');
 set(axes4,'FontName','Times New Roman','FontSize',25,'LineWidth',3)

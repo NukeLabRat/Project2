@@ -8,7 +8,7 @@ clc
 Re=100;
 dt=.0005;
 TimeSteps=2;
-Nodes=65;
+Nodes=50;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -179,7 +179,7 @@ PoissonIn.PoissonErrorMax=Error2/50;
 %                     Ustar(j,i)=2-Ustar(yEnd-1,i);
 % %                     Ustar2(j,i)=2-Ustar2(yEnd-1,i,k);
 %                 else
-%                     Ustar(j,i)=0;
+                    Ustar(j,i)=0;
 % %                     Ustar2(j,i)=0;
 %                 end
                 

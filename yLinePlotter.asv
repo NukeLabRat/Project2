@@ -1,5 +1,14 @@
 uCentral=interp2(uXlocations,uYlocations,u(:,:,k),pXlocations,pYlocations);
 vCentral=interp2(vXlocations,vYlocations,v(:,:,k),pXlocations,pYlocations); 
-yLines=2:7:51;
+yLines=25:4:45;
 figure
-plot(vCentral(:,yLines),pLocationsY(:,yLines))
+plot(uCentral(:,floor(Nodes/2)),pYlocations(:,floor(Nodes/2)),'bo','DisplayName','Gould','MarkerFaceColor','b','MarkerSize',12,'DisplayName');
+Bench=csvread('Re1000Bench.csv',1);
+hold on
+Plot1(2)=plot(Bench(:,1),Bench(:,2),'rsq','MarkerFaceColor','r','MarkerSize',10,'DisplayName','Ghia (1982)');
+axes3=gca;
+set(axes3,'FontName','Times New Roman','FontSize',28,'Layer','top','LineWidth',3);
+xlabel('u-velocity')
+ylabel('y')
+title('Velocity Profiles')
+grid on
