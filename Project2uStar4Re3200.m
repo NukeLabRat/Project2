@@ -5,8 +5,8 @@ close all
 clear
 clc
 
-Re=400;
-dt=5E-3;
+Re=3200;
+dt=8E-4;
 TimeSteps=2;
 Nodes=100;
 %% Geometry -
@@ -127,10 +127,10 @@ StartingTime=tic;
 TimeCheck=0;
 Error2=1;
 MainIterations=1;
-while Error2>5E-7 || MainIterations<100
+while Error2>5E-5 || MainIterations<100
 PoissonIn.PoissonErrorMax=Error2/50;
     if Error2<.05
-        PoissonIn.SOR=1.1;
+        PoissonIn.SOR=1;
     else
         PoissonIn.SOR=1;
     end
@@ -139,10 +139,6 @@ PoissonIn.PoissonErrorMax=Error2/50;
     v(:,:,1)=v(:,:,2);
     P(:,:,1)=P(:,:,2);
     k=1;
-    unow=u(:,:,1);
-    vnow=v(:,:,1);
-    pnow=P(:,:,1);
-
     for i = 1:xEnd-1
         for j = 1:yEnd
             if IsCenterX(j,i)==true %checks if node is central node

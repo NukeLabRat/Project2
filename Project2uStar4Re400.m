@@ -6,9 +6,9 @@ clear
 clc
 
 Re=400;
-dt=5E-3;
+dt=.008;
 TimeSteps=2;
-Nodes=100;
+Nodes=50;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir

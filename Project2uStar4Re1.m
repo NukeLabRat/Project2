@@ -5,10 +5,10 @@ close all
 clear
 clc
 
-Re=400;
-dt=5E-3;
+Re=10;
+dt=1E-3;
 TimeSteps=2;
-Nodes=100;
+Nodes=50;
 %% Geometry -
 L = 1; %m, y-dir
 W = 1; %m, x-dir
@@ -127,7 +127,7 @@ StartingTime=tic;
 TimeCheck=0;
 Error2=1;
 MainIterations=1;
-while Error2>5E-7 || MainIterations<100
+while Error2>5E-5 || MainIterations<100
 PoissonIn.PoissonErrorMax=Error2/50;
     if Error2<.05
         PoissonIn.SOR=1.1;
