@@ -324,6 +324,13 @@ reference "fig:Diagram"
 
 \begin_layout Subsection
 Governing Equations
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Governing-Equations"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -331,7 +338,27 @@ Com, ComxComy
 \end_layout
 
 \begin_layout Subsection
-Discretization
+Discretization and Boundary Conditions
+\end_layout
+
+\begin_layout Standard
+The governing equations of Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Governing-Equations"
+
+\end_inset
+
+ were discretized using a staggered grid.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Grid"
+
+\end_inset
+
+shows the node staggering method used in this work for an example grid consistin
+g of 25 interior pressure nodes.
 \end_layout
 
 \begin_layout Standard
@@ -438,7 +465,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename Nodes.png
+	filename SixPointGrid.png
 	lyxscale 25
 	width 50text%
 
@@ -473,11 +500,11 @@ name "fig:Grid"
 \end_layout
 
 \begin_layout Section
-Iterative Solution Methods
+Solution Method
 \end_layout
 
 \begin_layout Subsection
-Explicit Methods
+Projection Method
 \end_layout
 
 \begin_layout Standard
@@ -618,7 +645,7 @@ reference "eq:SOR"
 \end_layout
 
 \begin_layout Subsection
-Implicit Methods
+Poisson Solver
 \end_layout
 
 \begin_layout Standard
@@ -687,30 +714,6 @@ For the ADI method, the principal remains the same.
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsubsection
-Thomas Algorithm
-\end_layout
-
-\begin_layout Standard
-The tridiagonal matrices resulting from the implementation of both the SLOR
- and ADI methods was simultaneously solved using the Thomas Algorithm.
- While only valid for sparse, tridiagonal matrices such as those created
- by the SLOR and ADI methods, the Thomas Algorithm can theoretically be
- made to be highly efficient.
- The general algorithm consists of working down each row of the matrix,
- eliminating the subdiagonal term in each row.
- This results in an upper diagonalizing of the equation matrix, allowing
- for the unknown stream values to be obtained by back substitution.
- The specific code written to do this can be found in Appendix 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Thomas-Algorithm"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Section
