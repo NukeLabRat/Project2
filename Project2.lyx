@@ -4579,22 +4579,5 @@ Despite the limited resolution, the methods employed in solving the Laplace
  you in a awful, but fast language such as C or Fortran.
 \end_layout
 
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand include
-filename "../../../Desktop/Project1/ApendixDoc.lyx"
-
-\end_inset
-
-
-\end_layout
-
 \end_body
 \end_document

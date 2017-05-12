@@ -2359,198 +2359,6 @@ Results
 \end_layout
 
 \begin_layout Standard
-In Table 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:SolverTable"
-
-\end_inset
-
-, each of the solver methods used to solve Equation 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:Discret"
-
-\end_inset
-
- in the simple geometry is compared in speed and effectiveness.
- As 
-\end_layout
-
-\begin_layout Standard
-The values listed as 
-\begin_inset Quotes eld
-\end_inset
-
-Optimal 
-\begin_inset Formula $\omega$
-\end_inset
-
-
-\begin_inset Quotes erd
-\end_inset
-
- in Table 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:SolverTable"
-
-\end_inset
-
- were calculated using a bounded minimization function to determine the
- precise value of 
-\begin_inset Formula $\omega$
-\end_inset
-
- that would result the defined tolerance of 1E-8 being achieved in the fewest
- iterations.
- The overall effect of 
-\begin_inset Formula $\omega$
-\end_inset
-
- was also examined one each of the three solver algorithms featuring relaxation:
- SOR, SLOR and ADI.
- The relationship between 
-\begin_inset Formula $\omega$
-\end_inset
-
- and the number of required iterations to achieve tolerance is plotted in
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:RelaxCompare"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-In Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:RelaxCompare"
-
-\end_inset
-
-, the performance of each of the three examined solvers is shown to improve
- markedly with increasing 
-\begin_inset Formula $\omega$
-\end_inset
-
- until each reaches their 
-\begin_inset Formula $\omega_{Opt}$
-\end_inset
-
-.
- At values of under-relaxation higher than 
-\begin_inset Formula $\omega_{Opt}$
-\end_inset
-
-, the performance of each solver sharply degrades as each method becomes
- more and more unstable.
- It should also be noted that the Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:RelaxCompare"
-
-\end_inset
-
- shows that the performance of the SOR algorithm, in terms on number of
- required iterations, is equal to that of the G-S algorithm when a relaxation
- parameter of 1 is used.
- Also evident from Table 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:SolverTable"
-
-\end_inset
-
- is the fact that while the G-S algorithm requires more iterations than
- either the SLOR or ADI to achieve the desired error tolerance, G-S requires
- far less computation time per iteration that either of the other two methods.
- This fact was found to be due to the Matlab implementation of the Thomas
- algorithm used in this work.
- Due to its recursive nature, the Thomas algorithm is difficult to vectorize.
- Thus, due to Matlab's relatively slow looping speed, the implementation
- of this tri-diagonal implicit solver greatly reduced the effectiveness
- of the partially implicit SLOR and ADI.
- When programmed in Julia rather than Matlab, the author was able reduce
- the computational time required by the SLOR algorithm by an order of magnitude.
- However, given that Julia still possess almost no documentation and is
- absolutely terrible to use, this solution is not one suggested by the author.
- Rather, this author would simply suggest that Matlab's built in sparse
- matrix solver be used - a step that would both simplify the implementation
- of the SLOR and ADI algorithms and result in a significant performance
- boost.
- Of course, the obvious disadvantage of this approach, however, is that
- allowing for built-in algorithms to be used in the code would greatly reduce
- the project's effectiveness at making grad student's lives even more miserable.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-centering
-\end_layout
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename ../../../Desktop/Project1/SORcompare.png
-	lyxscale 40
-	scale 30
-
-\end_inset
-
-
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Effect of relaxation parameter on solvers 
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:RelaxCompare"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Results - Part 2
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Part2"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 For the second part of the this project, the box geometry was modified so
  that a portion of the right corner was removed.
  The line defining the removed corner is shown as the dotted line in 
@@ -3753,7 +3561,7 @@ separation "3pt"
 shadowsize "4pt"
 framecolor "black"
 backgroundcolor "none"
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Float figure
@@ -3776,7 +3584,7 @@ centering
 
 
 \begin_inset Graphics
-	filename ../../../Desktop/Project1/ContourCompare.png
+	filename Re400Stream.png
 	lyxscale 30
 	width 100line%
 	clip
@@ -3796,7 +3604,7 @@ centering
 
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Re1Stream-2"
+name "fig:Re400Stream"
 
 \end_inset
 
@@ -4077,7 +3885,7 @@ status open
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -4094,7 +3902,7 @@ centering
 
 
 \begin_inset Graphics
-	filename ../../../Desktop/Project1/IC2.png
+	filename Re1000Speed.png
 	lyxscale 40
 	width 100line%
 	clip
@@ -4111,7 +3919,7 @@ centering
 Flow Speed 
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Re1Speed-3"
+name "fig:Re1000Speed"
 
 \end_inset
 
@@ -4164,7 +3972,7 @@ separation "3pt"
 shadowsize "4pt"
 framecolor "black"
 backgroundcolor "none"
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Float figure
@@ -4174,7 +3982,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -4187,7 +3995,7 @@ centering
 
 
 \begin_inset Graphics
-	filename ../../../Desktop/Project1/ContourCompare.png
+	filename Re1000Stream.png
 	lyxscale 30
 	width 100line%
 	clip
@@ -4207,7 +4015,7 @@ centering
 
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Re1Stream-3"
+name "fig:Re1000Stream"
 
 \end_inset
 
@@ -4291,7 +4099,7 @@ Modified Wall
 placement h
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -4323,7 +4131,7 @@ separation "3pt"
 shadowsize "4pt"
 framecolor "black"
 backgroundcolor "none"
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Float figure
@@ -4346,7 +4154,7 @@ centering
 
 
 \begin_inset Graphics
-	filename ../../../Desktop/Project1/IC2mod.png
+	filename Re400profiles.png
 	lyxscale 40
 	width 100line%
 	clip
@@ -4360,10 +4168,10 @@ centering
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Initial conditions for modified wall
+Re 400
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:ICmod"
+name "fig:CenterlineCompare400"
 
 \end_inset
 
@@ -4416,13 +4224,13 @@ separation "3pt"
 shadowsize "4pt"
 framecolor "black"
 backgroundcolor "none"
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -4439,7 +4247,7 @@ centering
 
 
 \begin_inset Graphics
-	filename ../../../Desktop/Project1/Contour2mod.png
+	filename CenterlineVelocityRe1000.png
 	lyxscale 30
 	width 100line%
 	clip
@@ -4453,10 +4261,10 @@ centering
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Streamlines resulting from modified wall 
+Re400
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:ContourMod"
+name "fig:CenterlineCompare1000"
 
 \end_inset
 
@@ -4479,10 +4287,14 @@ name "fig:ContourMod"
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Modified geometry - shape 
+Comparison of calculated 
+\begin_inset Formula $u$
+\end_inset
+
+ velocity along cavity centerline 
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Mod"
+name "fig:CenterlineCompare"
 
 \end_inset
 
