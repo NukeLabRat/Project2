@@ -372,13 +372,6 @@ reference "fig:Diagram"
 
 \begin_layout Subsection
 Governing Equations
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Governing-Equations"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -391,6 +384,7 @@ In this work, it is assumed that the fluid within the cavity is not rarefied
 LatexCommand ref
 reference "eq:ConMass"
 
+<<<<<<< HEAD
 \end_inset
 
 , 
@@ -427,6 +421,10 @@ description "velocity in y-direction"
 \end_inset
 
 
+=======
+\begin_layout Subsection
+Discretization
+>>>>>>> parent of f428542... Lyx coming along
 \end_layout
 
 \begin_layout Standard
@@ -725,7 +723,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename SixPointGrid.png
+	filename Nodes.png
 	lyxscale 25
 	width 50text%
 
@@ -815,6 +813,17 @@ reference "eq:DiscEx2"
 
 \end_layout
 
+<<<<<<< HEAD
+=======
+\begin_layout Section
+Iterative Solution Methods
+\end_layout
+
+\begin_layout Subsection
+Explicit Methods
+\end_layout
+
+>>>>>>> parent of f428542... Lyx coming along
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
@@ -956,11 +965,107 @@ reference "eq:SOR"
  cost of stability.
  Conversely, lowering the relaxation parameter below unity will result in
  dramatically increased computational times, but provides greater stability.
+<<<<<<< HEAD
  In this work, values of 
 \begin_inset Formula $\omega$
+=======
+\end_layout
+
+\begin_layout Subsection
+Implicit Methods
+\end_layout
+
+\begin_layout Standard
+Two different partially implicit solution methods were used, Successive
+ Over-Relaxation by Lines (SLOR) and the Alternating Direction Implicit
+ (ADI) method.
+ In Equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SLOR"
+
+\end_inset
+
+, three unknown values are present.
+ These unknowns are the value of the stream function at the central point,
+ 
+\begin_inset Formula $\psi_{i,j}^{k+1}$
+\end_inset
+
+, and the values at the the two points adjacent to the central point on
+ row 
+\begin_inset Formula $j$
+\end_inset
+
+.
+ Solving this equation requires that an implicit method be used so that
+ the values of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ can be solved for the entire row 
+\begin_inset Formula $j$
+\end_inset
+
+ simultaneously.
+\end_layout
+
+\begin_layout Standard
+While more difficult to implement, this method has the major advantage that
+ it communicates information from the BC at the ends of each row instantly
+ in a single iteration.
+ This is in contrast to the very slow dispersal of information found in
+ the aforementioned explicit methods in which it could take 7 iterations
+ for a node in the center of the domain might to be affected by a change
+ in the boundary conditions.
+\end_layout
+
+\begin_layout Standard
+For the ADI method, the principal remains the same.
+ However, instead of each iteration consisting of solving the domain row
+ by row, in the Alternating Direction Implicit method will follow a sweep
+ of the rows of a domain with a similar sweep of the columns of a domain.
+ This method allows information from each extremity of the domain to quickly
+ propagate to the center.
+ The equation used for the ADI method is the same as that used for the SLOR
+ method, but which terms are known and which terms are solved for depend
+ on the direction of the sweep.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\psi_{i,j}^{k+1}=\left(1-\omega\right)\psi_{i,j}^{k}+\frac{\omega}{2\left(1+\beta^{2}\right)}\psi_{i+1,j}^{k+1}+\psi_{i-1,j}^{k+1}+\beta^{2}\left(\psi_{i,j+1}^{k}+\psi_{i,j-1}^{k+1}\right)\label{eq:SLOR}
+\end{equation}
+
+>>>>>>> parent of f428542... Lyx coming along
 \end_inset
 
  of between .9 and 1.3 were used.
+\end_layout
+
+\begin_layout Subsubsection
+Thomas Algorithm
+\end_layout
+
+\begin_layout Standard
+The tridiagonal matrices resulting from the implementation of both the SLOR
+ and ADI methods was simultaneously solved using the Thomas Algorithm.
+ While only valid for sparse, tridiagonal matrices such as those created
+ by the SLOR and ADI methods, the Thomas Algorithm can theoretically be
+ made to be highly efficient.
+ The general algorithm consists of working down each row of the matrix,
+ eliminating the subdiagonal term in each row.
+ This results in an upper diagonalizing of the equation matrix, allowing
+ for the unknown stream values to be obtained by back substitution.
+ The specific code written to do this can be found in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Thomas-Algorithm"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section

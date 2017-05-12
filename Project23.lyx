@@ -15,6 +15,12 @@
 \use_default_options false
 \begin_modules
 theorems-std
+fixltx2e
+figs-within-sections
+eqs-within-sections
+tabs-within-sections
+fix-cm
+graphicboxes
 \end_modules
 \maintain_unincluded_children false
 \language english
@@ -656,10 +662,8 @@ reference "eq:SLOR"
 \begin_inset Formula $j$
 \end_inset
 
-.
-<<<<<<< HEAD:Project22.lyx
- Interpolation was used whenever the scheme required information at a location
- between nodes.
+.<<<<<<< HEAD:Project22.lyx Interpolation was used whenever the scheme required
+ information at a location between nodes.
 \end_layout
 
 \begin_layout Standard
@@ -718,12 +722,8 @@ reference "eq:DiscEx2"
 
 \begin_layout Standard
 For the 
-\begin_inset Formula $u$
-=======
- Solving this equation requires that an implicit method be used so that
- the values of 
-\begin_inset Formula $\psi$
->>>>>>> parent of f428542... Lyx coming along:#Project2.lyx#
+\begin_inset Formula $u$ ======= Solving this equation requires that an implicit method be used so that the values of 
+
 \end_inset
 
  can be solved for the entire row 
